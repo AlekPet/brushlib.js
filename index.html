@@ -212,6 +212,7 @@
     brush_img.src = `${pathToBrush}${brushname}.png`
 
     var script = document.createElement('script');
+
     script.setAttribute('src', '/brushlib.js/' + pathToBrush + brushname + '.myb.js');
     script.setAttribute('id', 'brushscript');
     document.documentElement.firstChild.appendChild(script);
