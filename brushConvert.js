@@ -12,6 +12,18 @@ function isinValidProp(str) {
   return false;
 }
 
+function correctionFilename(filename) {
+  if (/^[0-9]/g.test(filename)) {
+    let filenameDigit = filename.match(/^([0-9]+)/)[0];
+    filename = `${filename.replace(filenameDigit, "")}${filenameDigit}`;
+  }
+
+  if (filename.includes("-")) filename = filename.replaceAll("-", "_");
+  filename = filename.replaceAll(/\W+/g, "");
+
+  return filename;
+}
+
 const readFileAsync = (pathFile, options) => {
   return new Promise((res, rej) => {
     fs.readFile(pathFile, "utf8", (err, data) => {
@@ -59,18 +71,10 @@ fs.readdir(
 
       const ext = path.extname(pathFile).slice(1);
       let filename = path.parse(pathFile).name;
-      let filename_ext = file.name;
 
       if (ext === "myb") {
-        if (/^[0-9]/g.test(filename)) {
-          let filenameDigit = filename.match(/^([0-9]+)/)[0];
-          filename = `${filename.replace(filenameDigit, "")}${filenameDigit}`;
-          filename_ext = `${filename.replace(
-            filenameDigit,
-            ""
-          )}${filenameDigit}.${ext}`;
-        }
-        promises.push(readFileAsync(pathFile, { filename_ext, filename }));
+        filename = correctionFilename(filename);
+        promises.push(readFileAsync(pathFile, { filename }));
       }
     });
 
@@ -81,12 +85,12 @@ fs.readdir(
 
         const {
           data,
-          options: { filename, filename_ext },
+          options: { filename },
         } = response;
 
         const dataToText = `var ${filename} = ${JSON.stringify(data)}`;
         const fileSave = fs.createWriteStream(
-          path.join(saveBrushes, `${filename_ext}.js`)
+          path.join(saveBrushes, `${filename}.myb.js`)
         );
 
         fileSave.write(dataToText);
@@ -125,20 +129,34 @@ function getData(str, filename) {
   const obj = {};
   if (str.includes("|")) {
     let vals = str.split("|").map((v) => v.trim());
-    if (vals.length !== 2) {
-      console.error(`[${filename}] Error length > 2 -> ${vals}`);
-      return null;
+    if (vals.length === 2) {
+      const [name, propValue] = vals[0].split(" ").map((v) => v.trim());
+      let propval = vals[1].split(" ").map((v) => v.trim());
+      const propname = propval.shift();
+      propval = propval.map((str) => Number(str.replace(/[(),]/g, "")));
+
+      obj[name] = {
+        base_value: parseFloat(propValue),
+        pointsList: { [propname]: propval },
+      };
+    } else {
+      const [name, propValue] = vals[0].split(" ").map((v) => v.trim());
+      obj[name] = {
+        base_value: parseFloat(propValue),
+        pointsList: {},
+      };
+
+      for (let i = 1; i < vals.length; i++) {
+        let propval = vals[i].split(" ").map((v) => v.trim());
+        const propname = propval.shift();
+        propval = propval.map((str) => Number(str.replace(/[(),]/g, "")));
+
+        obj[name].pointsList = {
+          ...obj[name].pointsList,
+          ...{ [propname]: propval },
+        };
+      }
     }
-
-    const [name, propValue] = vals[0].split(" ").map((v) => v.trim());
-    let propval = vals[1].split(" ").map((v) => v.trim());
-    const propname = propval.shift();
-    propval = propval.map((str) => Number(str.replace(/[(),]/g, "")));
-
-    obj[name] = {
-      base_value: parseFloat(propValue),
-      pointsList: { [propname]: propval },
-    };
   } else {
     const [name, propValue] = str.split(" ").map((v) => v.trim());
     obj[name] = { base_value: parseFloat(propValue) };
