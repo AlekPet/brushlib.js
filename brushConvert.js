@@ -1,9 +1,22 @@
+/*
+ * Title: BrushConverter
+ * Author: Aleksey Petrov (AlekPet)
+ * Guthub: https://github.com/AlekPet
+ * -----------------------------------
+ * Info:
+ * Old brush packs: https://github.com/mypaint/mypaint-brushes/releases/tag/pre_json_brushes
+ * Folder "08" it is pack brush, put in root project
+ * Folder "08_save" folder converted brush from mybrushlib.js
+ * File "select_options.txt" includes after converted option tags for select tag brushes.
+ */
+
 const fs = require("fs");
 const path = require("path");
+
 const pathBrushes = path.join(__dirname, "08");
 const saveBrushes = path.join(__dirname, "08_save");
 
-const filterPropsMissing = ["#", "version"];
+const filterPropsMissing = ["#"];
 
 function isinValidProp(str) {
   for (let p of filterPropsMissing) {
@@ -76,9 +89,16 @@ fs.readdir(
         filename = correctionFilename(filename);
         promises.push(readFileAsync(pathFile, { filename }));
       }
+
+      if (ext === "png") {
+        filename = correctionFilename(filename);
+        filename = filename.replace("_prev", "");
+        fs.copyFileSync(pathFile, path.join(saveBrushes, `${filename}.${ext}`));
+      }
     });
 
     let countComplete = 0;
+    let optionValues = "";
     Promise.all(promises).then((results) => {
       results.forEach((response) => {
         if (!Object.keys(response).length) return true;
@@ -93,10 +113,22 @@ fs.readdir(
           path.join(saveBrushes, `${filename}.myb.js`)
         );
 
+        optionValues += `<option value="${filename}" data-path="08_save/">${
+          filename[0].toUpperCase() + filename.slice(1)
+        }</option>\n`;
+
         fileSave.write(dataToText);
         countComplete += 1;
       });
-      console.log(`FIles converted ${countComplete} of ${promises.length}!`);
+
+      console.log(`Files converted ${countComplete} of ${promises.length}!`);
+      const fileSaveOptions = fs.createWriteStream(
+        path.join(__dirname, `select_options.txt`)
+      );
+      fileSaveOptions.write(optionValues, (err) => {
+        if (err) console.log(err);
+        console.log(`File 'select_options.txt' created!`);
+      });
     });
   }
 );

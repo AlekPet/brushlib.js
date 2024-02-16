@@ -4,8 +4,49 @@
 <script src="mybrush.js"></script>
 <script src="brushes/charcoal.myb.js"></script>
 <style>
+  body {
+    background: silver;
+  }
+
   #thecanvas {
     touch-action: none
+  }
+
+  .box {
+    max-width: 800px;
+  }
+
+  .box,
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .row {
+    display: flex;
+    gap: 5px;
+  }
+
+  .option__label {
+    background: gainsboro;
+    padding: 3px;
+    flex: 1 1 30%;
+  }
+
+  .option__input {
+    text-align: center;
+    background: darkgray;
+    flex: 1 1 70%;
+  }
+
+  .select__brush {
+    align-items: center;
+    gap: 20px;
+  }
+
+  .image__brush {
+    min-width: 100px;
   }
 </style>
 <!--
@@ -161,10 +202,17 @@
 
   function selectbrush() {
     var bsel = document.getElementById("brushselector");
+    var brush_img = document.getElementById("brush_img");
     brushname = bsel.options[bsel.selectedIndex].value;
 
+    if (brushname === 'separator') return
+
+    const pathToBrush = bsel.options[bsel.selectedIndex].dataset.path
+
+    brush_img.src = `${pathToBrush}${brushname}.png`
+
     var script = document.createElement('script');
-    script.setAttribute('src', 'brushes/' + brushname + '.myb.js');
+    script.setAttribute('src', '/brushlib.js/' + pathToBrush + brushname + '.myb.js');
     script.setAttribute('id', 'brushscript');
     document.documentElement.firstChild.appendChild(script);
     var loadbrush = "brush=new MypaintBrush(" + brushname + "); updateui(" + brushname + ")";
@@ -173,42 +221,370 @@
   }
 </script>
 
-<body onload="onLoad();" style="background: silver">
-  <canvas width="800" height="500" id="thecanvas" onmousemove="mousemove(event)" onmousedown="mousedown(event)"
-    onmouseup="mouseup(event)"></canvas>
-  <br />
-  <a href="https://github.com/yapcheahshen/brushlib.js">MyPaint BrushLib in Javascript </a>
-  <embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" HIDDEN="TRUE"></embed>
+<body onload="onLoad();">
 
-  <br />Brushes:<select id="brushselector" onchange="selectbrush()">
-    <option value="b000">B000</option>
-    <option value="brush">Brush</option>
-    <option value="calligraphy">Calligraphy</option>
-    <option value="charcoal">Charcoal</option>
-    <option value="coarse_bulk_1">Coarse_bulk_1</option>
-    <option value="eraser">Eraser</option>
-    <option value="fur">Fur</option>
-    <option value="glow">Glow</option>
-    <option value="impressionism">Impressionism</option>
-    <option value="leaves">Leaves</option>
-    <option value="maobi">Maobi</option>
-    <option value="pen">Pen</option>
-    <option value="pencil">Pencil</option>
-    <option value="sewing">Sewing</option>
-    <option value="short_grass">Short_grass</option>
-    <option value="texture_03">Texture_03</option>
-    <option value="texture_06">Texture_06</option>
-    <option value="watercolor">Watercolor</option>
-  </select>
-  <br />Pressure for Mouse: <input type="range" id="mousepressure" min="1" max="100" value="75" />1.0
-  <br /><span id="colorbox">&nsbp;&nsbp;</span>
-  <br />Hue: <input type="range" id="color_h" min="1" max="100" value="0" onchange="colorchanged()" />1.0
-  <br />Sat: <input type="range" id="color_s" min="1" max="100" value="0" onchange="colorchanged()" />1.0
-  <br />Vue: <input type="range" id="color_v" min="1" max="100" value="0" onchange="colorchanged()" />1.0
-
-  <br>dabs:<span id="dab_count"></span>
-  <br>getcolor:<span id="getcolor_count"></span>
-  <br>elapse:<span id="divelapse"></span>
+  <div class="box">
+    <div class="column">
+      <div class="box__canvas">
+        <canvas width="800" height="500" id="thecanvas" onmousemove="mousemove(event)" onmousedown="mousedown(event)"
+          onmouseup="mouseup(event)"></canvas>
+      </div>
+      <div>
+        <a href="https://github.com/yapcheahshen/brushlib.js">MyPaint BrushLib in Javascript </a>
+        <embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" HIDDEN="TRUE"></embed>
+      </div>
+    </div>
+    <div class="column">
+      <div class="row option select__brush">
+        <div class="option__label">Brushes:</div>
+        <div class="option__input">
+          <div>
+            <select id="brushselector" onchange="selectbrush()">
+              <option value="b000" data-path="brushes/">B000</option>
+              <option value="brush" data-path="brushes/">Brush</option>
+              <option value="calligraphy" data-path="brushes/">Calligraphy</option>
+              <option value="charcoal" data-path="brushes/">Charcoal</option>
+              <option value="coarse_bulk_1" data-path="brushes/">Coarse_bulk_1</option>
+              <option value="eraser" data-path="brushes/">Eraser</option>
+              <option value="fur" data-path="brushes/">Fur</option>
+              <option value="glow" data-path="brushes/">Glow</option>
+              <option value="impressionism" data-path="brushes/">Impressionism</option>
+              <option value="leaves" data-path="brushes/">Leaves</option>
+              <option value="maobi" data-path="brushes/">Maobi</option>
+              <option value="pen" data-path="brushes/">Pen</option>
+              <option value="pencil" data-path="brushes/">Pencil</option>
+              <option value="sewing" data-path="brushes/">Sewing</option>
+              <option value="short_grass" data-path="brushes/">Short_grass</option>
+              <option value="texture_03" data-path="brushes/">Texture_03</option>
+              <option value="texture_06" data-path="brushes/">Texture_06</option>
+              <option value="watercolor" data-path="brushes/">Watercolor</option>
+              <option value="separator">--------- My brushes ---------</option> -->
+              <!-- my -->
+              <option value="_Opaque100" data-path="08_save/">_Opaque100</option>
+              <option value="pixel1" data-path="08_save/">Pixel1</option>
+              <option value="B_pencil2" data-path="08_save/">B_pencil2</option>
+              <option value="B_pencil4" data-path="08_save/">B_pencil4</option>
+              <option value="ab009" data-path="08_save/">Ab009</option>
+              <option value="ab028" data-path="08_save/">Ab028</option>
+              <option value="ab043" data-path="08_save/">Ab043</option>
+              <option value="acrylic_01_only_water" data-path="08_save/">Acrylic_01_only_water</option>
+              <option value="acrylic_01_paint" data-path="08_save/">Acrylic_01_paint</option>
+              <option value="acrylic_01_with_water" data-path="08_save/">Acrylic_01_with_water</option>
+              <option value="acrylic_02_only_water" data-path="08_save/">Acrylic_02_only_water</option>
+              <option value="acrylic_02_paint" data-path="08_save/">Acrylic_02_paint</option>
+              <option value="acrylic_02_with_water" data-path="08_save/">Acrylic_02_with_water</option>
+              <option value="airbrush_digital" data-path="08_save/">Airbrush_digital</option>
+              <option value="airbrush_real_dirty" data-path="08_save/">Airbrush_real_dirty</option>
+              <option value="airbrush_real" data-path="08_save/">Airbrush_real</option>
+              <option value="Airbrush" data-path="08_save/">Airbrush</option>
+              <option value="aspect_fun_1" data-path="08_save/">Aspect_fun_1</option>
+              <option value="aspect_fun_3" data-path="08_save/">Aspect_fun_3</option>
+              <option value="aspec_fun_5" data-path="08_save/">Aspec_fun_5</option>
+              <option value="B_pencil" data-path="08_save/">B_pencil</option>
+              <option value="ballpoint_pen" data-path="08_save/">Ballpoint_pen</option>
+              <option value="basic_flat" data-path="08_save/">Basic_flat</option>
+              <option value="basic_round" data-path="08_save/">Basic_round</option>
+              <option value="basic" data-path="08_save/">Basic</option>
+              <option value="Beamlight_01" data-path="08_save/">Beamlight_01</option>
+              <option value="bi000" data-path="08_save/">Bi000</option>
+              <option value="bi001" data-path="08_save/">Bi001</option>
+              <option value="bi003" data-path="08_save/">Bi003</option>
+              <option value="bi006" data-path="08_save/">Bi006</option>
+              <option value="bi010" data-path="08_save/">Bi010</option>
+              <option value="blendpaint" data-path="08_save/">Blendpaint</option>
+              <option value="blur" data-path="08_save/">Blur</option>
+              <option value="Blur_ramon" data-path="08_save/">Blur_ramon</option>
+              <option value="Brush_blur" data-path="08_save/">Brush_blur</option>
+              <option value="bulk" data-path="08_save/">Bulk</option>
+              <option value="Caligraph" data-path="08_save/">Caligraph</option>
+              <option value="charcoal_02" data-path="08_save/">Charcoal_02</option>
+              <option value="charcoal_blur2" data-path="08_save/">Charcoal_blur2</option>
+              <option value="charcoal" data-path="08_save/">Charcoal</option>
+              <option value="Charcoal_ramon" data-path="08_save/">Charcoal_ramon</option>
+              <option value="Classic_Paint" data-path="08_save/">Classic_Paint</option>
+              <option value="Clouds" data-path="08_save/">Clouds</option>
+              <option value="Clouds_2" data-path="08_save/">Clouds_2</option>
+              <option value="coarse_bulk_1" data-path="08_save/">Coarse_bulk_1</option>
+              <option value="coarse_bulk_2" data-path="08_save/">Coarse_bulk_2</option>
+              <option value="coarse_bulk_3" data-path="08_save/">Coarse_bulk_3</option>
+              <option value="coarse_bulk_4" data-path="08_save/">Coarse_bulk_4</option>
+              <option value="decoration_01" data-path="08_save/">Decoration_01</option>
+              <option value="decoration_02" data-path="08_save/">Decoration_02</option>
+              <option value="decoration_03" data-path="08_save/">Decoration_03</option>
+              <option value="decoration_04" data-path="08_save/">Decoration_04</option>
+              <option value="decoration_05" data-path="08_save/">Decoration_05</option>
+              <option value="decoration_06" data-path="08_save/">Decoration_06</option>
+              <option value="decoration_07" data-path="08_save/">Decoration_07</option>
+              <option value="decoration_08" data-path="08_save/">Decoration_08</option>
+              <option value="decoration_09" data-path="08_save/">Decoration_09</option>
+              <option value="Delayed_Line" data-path="08_save/">Delayed_Line</option>
+              <option value="detail_soft" data-path="08_save/">Detail_soft</option>
+              <option value="details_hard" data-path="08_save/">Details_hard</option>
+              <option value="dry_brush" data-path="08_save/">Dry_brush</option>
+              <option value="Dust" data-path="08_save/">Dust</option>
+              <option value="entropy_semi_eraser" data-path="08_save/">Entropy_semi_eraser</option>
+              <option value="Fine_Pen" data-path="08_save/">Fine_Pen</option>
+              <option value="fur" data-path="08_save/">Fur</option>
+              <option value="Glazing" data-path="08_save/">Glazing</option>
+              <option value="glow" data-path="08_save/">Glow</option>
+              <option value="Glow_ramon" data-path="08_save/">Glow_ramon</option>
+              <option value="Grain" data-path="08_save/">Grain</option>
+              <option value="Grass_1" data-path="08_save/">Grass_1</option>
+              <option value="Grass_2" data-path="08_save/">Grass_2</option>
+              <option value="Grass_3" data-path="08_save/">Grass_3</option>
+              <option value="Grass_P" data-path="08_save/">Grass_P</option>
+              <option value="hair" data-path="08_save/">Hair</option>
+              <option value="Hair2" data-path="08_save/">Hair2</option>
+              <option value="Hair_" data-path="08_save/">Hair_</option>
+              <option value="HardSoft" data-path="08_save/">HardSoft</option>
+              <option value="Hard_Eraser" data-path="08_save/">Hard_Eraser</option>
+              <option value="hard_sting" data-path="08_save/">Hard_sting</option>
+              <option value="HB_pencil" data-path="08_save/">HB_pencil</option>
+              <option value="hue_fun" data-path="08_save/">Hue_fun</option>
+              <option value="Ico_Alias_Brush" data-path="08_save/">Ico_Alias_Brush</option>
+              <option value="Ico_Basic_Round" data-path="08_save/">Ico_Basic_Round</option>
+              <option value="Ico_Bubble_Blender" data-path="08_save/">Ico_Bubble_Blender</option>
+              <option value="Ico_Bubble_Brush" data-path="08_save/">Ico_Bubble_Brush</option>
+              <option value="Ico_Calligraphic_Pen" data-path="08_save/">Ico_Calligraphic_Pen</option>
+              <option value="Ico_Calligraphic_Pen_noborder" data-path="08_save/">Ico_Calligraphic_Pen_noborder</option>
+              <option value="Ico_Chaotic_Smudge" data-path="08_save/">Ico_Chaotic_Smudge</option>
+              <option value="Ico_Color_Smudge_" data-path="08_save/">Ico_Color_Smudge_</option>
+              <option value="Ico_Crazy_Line" data-path="08_save/">Ico_Crazy_Line</option>
+              <option value="Ico_Cutting_Flat" data-path="08_save/">Ico_Cutting_Flat</option>
+              <option value="Ico_Dry_Pen" data-path="08_save/">Ico_Dry_Pen</option>
+              <option value="Ico_Felt_pen" data-path="08_save/">Ico_Felt_pen</option>
+              <option value="Ico_Flake_Blender" data-path="08_save/">Ico_Flake_Blender</option>
+              <option value="Ico_Flake_Blender_02" data-path="08_save/">Ico_Flake_Blender_02</option>
+              <option value="Ico_Flake_Dropping" data-path="08_save/">Ico_Flake_Dropping</option>
+              <option value="Ico_Flat_Basic" data-path="08_save/">Ico_Flat_Basic</option>
+              <option value="Ico_Flat_Blender" data-path="08_save/">Ico_Flat_Blender</option>
+              <option value="Ico_Flat_Mix" data-path="08_save/">Ico_Flat_Mix</option>
+              <option value="Ico_Flat_Pen" data-path="08_save/">Ico_Flat_Pen</option>
+              <option value="Ico_Glitter_Smudge_B" data-path="08_save/">Ico_Glitter_Smudge_B</option>
+              <option value="Ico_Hard_Eraser" data-path="08_save/">Ico_Hard_Eraser</option>
+              <option value="Ico_Hard_Oil" data-path="08_save/">Ico_Hard_Oil</option>
+              <option value="Ico_Impressionism_01" data-path="08_save/">Ico_Impressionism_01</option>
+              <option value="Ico_Impressionism_02" data-path="08_save/">Ico_Impressionism_02</option>
+              <option value="Ico_Irregular_Tube" data-path="08_save/">Ico_Irregular_Tube</option>
+              <option value="Ico_Jittering_Water" data-path="08_save/">Ico_Jittering_Water</option>
+              <option value="Ico_Linear_Watercolor" data-path="08_save/">Ico_Linear_Watercolor</option>
+              <option value="Ico_Line_Dropping" data-path="08_save/">Ico_Line_Dropping</option>
+              <option value="Ico_Line_Sketcher" data-path="08_save/">Ico_Line_Sketcher</option>
+              <option value="Ico_Liquid_Pen_" data-path="08_save/">Ico_Liquid_Pen_</option>
+              <option value="Ico_Micro_Felt_Pen" data-path="08_save/">Ico_Micro_Felt_Pen</option>
+              <option value="Ico_Mod_Deevad_Basic" data-path="08_save/">Ico_Mod_Deevad_Basic</option>
+              <option value="Ico_NewBasic__MultiC" data-path="08_save/">Ico_NewBasic__MultiC</option>
+              <option value="Ico_New_Basic" data-path="08_save/">Ico_New_Basic</option>
+              <option value="Ico_New_Basic_B" data-path="08_save/">Ico_New_Basic_B</option>
+              <option value="Ico_OC_Brush" data-path="08_save/">Ico_OC_Brush</option>
+              <option value="Ico_OC_Hard_Pen" data-path="08_save/">Ico_OC_Hard_Pen</option>
+              <option value="Ico_OC_Pen" data-path="08_save/">Ico_OC_Pen</option>
+              <option value="Ico_Oil_Blender" data-path="08_save/">Ico_Oil_Blender</option>
+              <option value="Ico_Oil_Blender_B" data-path="08_save/">Ico_Oil_Blender_B</option>
+              <option value="Ico_Oil_Blender_C" data-path="08_save/">Ico_Oil_Blender_C</option>
+              <option value="Ico_Pastel_Stain" data-path="08_save/">Ico_Pastel_Stain</option>
+              <option value="Ico_Precise_Pen" data-path="08_save/">Ico_Precise_Pen</option>
+              <option value="Ico_Precise_Pen_02" data-path="08_save/">Ico_Precise_Pen_02</option>
+              <option value="Ico_Rigid_Pen" data-path="08_save/">Ico_Rigid_Pen</option>
+              <option value="Ico_Smudge_Glitter" data-path="08_save/">Ico_Smudge_Glitter</option>
+              <option value="Ico_Soft_Eraser" data-path="08_save/">Ico_Soft_Eraser</option>
+              <option value="Ico_Soft_Oil" data-path="08_save/">Ico_Soft_Oil</option>
+              <option value="Ico_Variable_Flat_Pen" data-path="08_save/">Ico_Variable_Flat_Pen</option>
+              <option value="Ico_Watercolor_01" data-path="08_save/">Ico_Watercolor_01</option>
+              <option value="Ico_Watercolor_Smudge" data-path="08_save/">Ico_Watercolor_Smudge</option>
+              <option value="Ico_Watery_Pen" data-path="08_save/">Ico_Watery_Pen</option>
+              <option value="Ico_Watery_Pen_02" data-path="08_save/">Ico_Watery_Pen_02</option>
+              <option value="Ico_Water_Line" data-path="08_save/">Ico_Water_Line</option>
+              <option value="Ico_Water_Mix" data-path="08_save/">Ico_Water_Mix</option>
+              <option value="Ico_Water_Splash" data-path="08_save/">Ico_Water_Splash</option>
+              <option value="Ico_Water_Stain" data-path="08_save/">Ico_Water_Stain</option>
+              <option value="Ico_Water_Stain_B" data-path="08_save/">Ico_Water_Stain_B</option>
+              <option value="Ico_Weak_Flat" data-path="08_save/">Ico_Weak_Flat</option>
+              <option value="Ico_Weak_Painting" data-path="08_save/">Ico_Weak_Painting</option>
+              <option value="Ico_Wet_Flat" data-path="08_save/">Ico_Wet_Flat</option>
+              <option value="ink_fill" data-path="08_save/">Ink_fill</option>
+              <option value="ink_pen" data-path="08_save/">Ink_pen</option>
+              <option value="ink" data-path="08_save/">Ink</option>
+              <option value="ink_eraser" data-path="08_save/">Ink_eraser</option>
+              <option value="ink_hard" data-path="08_save/">Ink_hard</option>
+              <option value="Jitter" data-path="08_save/">Jitter</option>
+              <option value="Jittered_splat" data-path="08_save/">Jittered_splat</option>
+              <option value="kabura" data-path="08_save/">Kabura</option>
+              <option value="Knife" data-path="08_save/">Knife</option>
+              <option value="Knife_Jitt" data-path="08_save/">Knife_Jitt</option>
+              <option value="leaves" data-path="08_save/">Leaves</option>
+              <option value="long_grass" data-path="08_save/">Long_grass</option>
+              <option value="loosedots" data-path="08_save/">Loosedots</option>
+              <option value="marker_02" data-path="08_save/">Marker_02</option>
+              <option value="marker_03" data-path="08_save/">Marker_03</option>
+              <option value="marker_04" data-path="08_save/">Marker_04</option>
+              <option value="marker_06" data-path="08_save/">Marker_06</option>
+              <option value="Marker" data-path="08_save/">Marker</option>
+              <option value="modelling" data-path="08_save/">Modelling</option>
+              <option value="o001" data-path="08_save/">O001</option>
+              <option value="o009" data-path="08_save/">O009</option>
+              <option value="o014" data-path="08_save/">O014</option>
+              <option value="o017" data-path="08_save/">O017</option>
+              <option value="o022" data-path="08_save/">O022</option>
+              <option value="o028" data-path="08_save/">O028</option>
+              <option value="o032" data-path="08_save/">O032</option>
+              <option value="o300" data-path="08_save/">O300</option>
+              <option value="o388" data-path="08_save/">O388</option>
+              <option value="o397" data-path="08_save/">O397</option>
+              <option value="o398" data-path="08_save/">O398</option>
+              <option value="o512" data-path="08_save/">O512</option>
+              <option value="o594" data-path="08_save/">O594</option>
+              <option value="o826" data-path="08_save/">O826</option>
+              <option value="o834" data-path="08_save/">O834</option>
+              <option value="o945" data-path="08_save/">O945</option>
+              <option value="Offset_Splats" data-path="08_save/">Offset_Splats</option>
+              <option value="oil_02_clean" data-path="08_save/">Oil_02_clean</option>
+              <option value="oil_02_paint" data-path="08_save/">Oil_02_paint</option>
+              <option value="oil_04_clean" data-path="08_save/">Oil_04_clean</option>
+              <option value="oil_04_paint" data-path="08_save/">Oil_04_paint</option>
+              <option value="oil_05_clean" data-path="08_save/">Oil_05_clean</option>
+              <option value="oil_05_paint" data-path="08_save/">Oil_05_paint</option>
+              <option value="PShade2" data-path="08_save/">PShade2</option>
+              <option value="P_Shade" data-path="08_save/">P_Shade</option>
+              <option value="painting_knife" data-path="08_save/">Painting_knife</option>
+              <option value="PenBrush" data-path="08_save/">PenBrush</option>
+              <option value="pencil_2b_deevad" data-path="08_save/">Pencil_2b_deevad</option>
+              <option value="pencil_6b" data-path="08_save/">Pencil_6b</option>
+              <option value="pencil_blur" data-path="08_save/">Pencil_blur</option>
+              <option value="pencil_color" data-path="08_save/">Pencil_color</option>
+              <option value="pencil_h" data-path="08_save/">Pencil_h</option>
+              <option value="pencil_hb" data-path="08_save/">Pencil_hb</option>
+              <option value="pencil_mechanical" data-path="08_save/">Pencil_mechanical</option>
+              <option value="pencil_rubber" data-path="08_save/">Pencil_rubber</option>
+              <option value="pencil" data-path="08_save/">Pencil</option>
+              <option value="Pencil_Ink" data-path="08_save/">Pencil_Ink</option>
+              <option value="pick_and_drag" data-path="08_save/">Pick_and_drag</option>
+              <option value="pixelblocking" data-path="08_save/">Pixelblocking</option>
+              <option value="pixel_hardink" data-path="08_save/">Pixel_hardink</option>
+              <option value="PointCloud" data-path="08_save/">PointCloud</option>
+              <option value="pointy_ink" data-path="08_save/">Pointy_ink</option>
+              <option value="redbrush" data-path="08_save/">Redbrush</option>
+              <option value="Round" data-path="08_save/">Round</option>
+              <option value="Round_Bl" data-path="08_save/">Round_Bl</option>
+              <option value="RS_blendOP" data-path="08_save/">RS_blendOP</option>
+              <option value="s000" data-path="08_save/">S000</option>
+              <option value="s003" data-path="08_save/">S003</option>
+              <option value="s004" data-path="08_save/">S004</option>
+              <option value="s006" data-path="08_save/">S006</option>
+              <option value="s007" data-path="08_save/">S007</option>
+              <option value="s008" data-path="08_save/">S008</option>
+              <option value="s011" data-path="08_save/">S011</option>
+              <option value="s014" data-path="08_save/">S014</option>
+              <option value="s015" data-path="08_save/">S015</option>
+              <option value="s018" data-path="08_save/">S018</option>
+              <option value="s020" data-path="08_save/">S020</option>
+              <option value="s021" data-path="08_save/">S021</option>
+              <option value="s023" data-path="08_save/">S023</option>
+              <option value="s109" data-path="08_save/">S109</option>
+              <option value="short_grass" data-path="08_save/">Short_grass</option>
+              <option value="Simple_Pen" data-path="08_save/">Simple_Pen</option>
+              <option value="Sketch_1" data-path="08_save/">Sketch_1</option>
+              <option value="Sketch_2" data-path="08_save/">Sketch_2</option>
+              <option value="Smear" data-path="08_save/">Smear</option>
+              <option value="smudge_blur" data-path="08_save/">Smudge_blur</option>
+              <option value="smudge_classic" data-path="08_save/">Smudge_classic</option>
+              <option value="smudge" data-path="08_save/">Smudge</option>
+              <option value="Smudge_ramon" data-path="08_save/">Smudge_ramon</option>
+              <option value="snow_1" data-path="08_save/">Snow_1</option>
+              <option value="snow_2" data-path="08_save/">Snow_2</option>
+              <option value="soft_large" data-path="08_save/">Soft_large</option>
+              <option value="Soft_Bubbles" data-path="08_save/">Soft_Bubbles</option>
+              <option value="Soft_Eraser" data-path="08_save/">Soft_Eraser</option>
+              <option value="soft_sting" data-path="08_save/">Soft_sting</option>
+              <option value="soft_water" data-path="08_save/">Soft_water</option>
+              <option value="solid_water" data-path="08_save/">Solid_water</option>
+              <option value="Sparks" data-path="08_save/">Sparks</option>
+              <option value="Splats_1" data-path="08_save/">Splats_1</option>
+              <option value="Splats_2" data-path="08_save/">Splats_2</option>
+              <option value="Splats_3" data-path="08_save/">Splats_3</option>
+              <option value="Splats_4" data-path="08_save/">Splats_4</option>
+              <option value="Splats_5" data-path="08_save/">Splats_5</option>
+              <option value="splatter_01" data-path="08_save/">Splatter_01</option>
+              <option value="splatter_03" data-path="08_save/">Splatter_03</option>
+              <option value="splatter_05" data-path="08_save/">Splatter_05</option>
+              <option value="splatter_06" data-path="08_save/">Splatter_06</option>
+              <option value="Splatter_drop" data-path="08_save/">Splatter_drop</option>
+              <option value="Splatter_drop2" data-path="08_save/">Splatter_drop2</option>
+              <option value="Starfield" data-path="08_save/">Starfield</option>
+              <option value="subtle_pencil" data-path="08_save/">Subtle_pencil</option>
+              <option value="texture_01" data-path="08_save/">Texture_01</option>
+              <option value="texture_02" data-path="08_save/">Texture_02</option>
+              <option value="texture_04" data-path="08_save/">Texture_04</option>
+              <option value="texture_05" data-path="08_save/">Texture_05</option>
+              <option value="texture_07" data-path="08_save/">Texture_07</option>
+              <option value="texture_08" data-path="08_save/">Texture_08</option>
+              <option value="texture_09" data-path="08_save/">Texture_09</option>
+              <option value="texture_10" data-path="08_save/">Texture_10</option>
+              <option value="texture_11" data-path="08_save/">Texture_11</option>
+              <option value="texture_tree" data-path="08_save/">Texture_tree</option>
+              <option value="textured_angle" data-path="08_save/">Textured_angle</option>
+              <option value="textured_charcoal" data-path="08_save/">Textured_charcoal</option>
+              <option value="textured_grain" data-path="08_save/">Textured_grain</option>
+              <option value="textured_ink" data-path="08_save/">Textured_ink</option>
+              <option value="tree" data-path="08_save/">Tree</option>
+              <option value="tree_2" data-path="08_save/">Tree_2</option>
+              <option value="water_03" data-path="08_save/">Water_03</option>
+              <option value="water_04" data-path="08_save/">Water_04</option>
+              <option value="waterblend" data-path="08_save/">Waterblend</option>
+              <option value="watercolor_01_paint" data-path="08_save/">Watercolor_01_paint</option>
+              <option value="watercolor_01_water" data-path="08_save/">Watercolor_01_water</option>
+              <option value="Water_Splats" data-path="08_save/">Water_Splats</option>
+              <option value="wet_flat" data-path="08_save/">Wet_flat</option>
+              <option value="wet_round" data-path="08_save/">Wet_round</option>
+              <option value="wet_airbrush" data-path="08_save/">Wet_airbrush</option>
+              <option value="Wet_Direction" data-path="08_save/">Wet_Direction</option>
+              <option value="wet_round" data-path="08_save/">Wet_round</option>
+              <option value="Wet_Soft" data-path="08_save/">Wet_Soft</option>
+              <option value="Wet_Solid" data-path="08_save/">Wet_Solid</option>
+            </select>
+          </div>
+        </div>
+        <div class="image__brush">
+          <img src="/brushlib.js/brushes/charcoal.png" alt="Brush Image" id="brush_img"
+            onerror="this.src = '/brushlib.js/assets/img/image_invalid.svg'">
+        </div>
+      </div>
+      <div class="row option">
+        <div class="option__label">Pressure for Mouse:</div>
+        <div class="option__input">
+          <input type="range" id="mousepressure" min="1" max="100" value="75" />1.0
+          <p><span id="colorbox">&nsbp;&nsbp;</span></p>
+        </div>
+      </div>
+      <div class="row option">
+        <div class="option__label">Hue:</div>
+        <div class="option__input"><input type="range" id="color_h" min="1" max="100" value="0"
+            onchange="colorchanged()" />1.0</div>
+      </div>
+      <div class="row option">
+        <div class="option__label">Sat</div>
+        <div class="option__input"><input type="range" id="color_s" min="1" max="100" value="0"
+            onchange="colorchanged()" />1.0</div>
+      </div>
+      <div class="row option">
+        <div class="option__label">Vue</div>
+        <div class="option__input"><input type="range" id="color_v" min="1" max="100" value="0"
+            onchange="colorchanged()" />1.0</div>
+      </div>
+      <div class="row option">
+        <div class="option__label">dabs:</div>
+        <div class="option__input"><span id="dab_count"></span></div>
+      </div>
+      <div class="row option">
+        <div class="option__label">getcolor:</div>
+        <div class="option__input"><span id="getcolor_count"></span></div>
+      </div>
+      <div class="row option">
+        <div class="option__label">elapse:</div>
+        <div class="option__input"><span id="divelapse"></span></div>
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
