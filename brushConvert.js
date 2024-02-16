@@ -21,7 +21,12 @@ const readFileAsync = (pathFile, options) => {
       lines = lines.filter(
         (line) => line.trim() !== "" && !isinValidProp(line)
       );
-      lines = lines.map((line) => getData(line));
+      lines = lines.map((line) => getData(line, options.filename));
+
+      const nulls = lines.filter((v) => v === null);
+      if (nulls.length > 0) {
+        res({});
+      }
 
       let endObj;
       lines.forEach((prop) => {
@@ -69,23 +74,25 @@ fs.readdir(
       }
     });
 
+    let countComplete = 0;
     Promise.all(promises).then((results) => {
       results.forEach((response) => {
-        if (response) {
-          const {
-            data,
-            options: { filename, filename_ext },
-          } = response;
-          const dataToText = `var ${filename} = ${JSON.stringify(data)}`;
-          const fileSave = fs.createWriteStream(
-            path.join(saveBrushes, `${filename_ext}.js`)
-          );
+        if (!Object.keys(response).length) return true;
 
-          fileSave.write(dataToText);
-          console.log(`Файл ${filename_ext}.js создан!`);
-        }
+        const {
+          data,
+          options: { filename, filename_ext },
+        } = response;
+
+        const dataToText = `var ${filename} = ${JSON.stringify(data)}`;
+        const fileSave = fs.createWriteStream(
+          path.join(saveBrushes, `${filename_ext}.js`)
+        );
+
+        fileSave.write(dataToText);
+        countComplete += 1;
       });
-      console.log("Файлы созданы!");
+      console.log(`FIles converted ${countComplete} of ${promises.length}!`);
     });
   }
 );
@@ -114,23 +121,24 @@ function convertMybToJs(pen) {
 }
 
 // Old version myb
-function getData(str) {
+function getData(str, filename) {
   const obj = {};
   if (str.includes("|")) {
     let vals = str.split("|").map((v) => v.trim());
-    if (vals.length === 2) {
-      const [name, propValue] = vals[0].split(" ").map((v) => v.trim());
-      let propval = vals[1].split(" ").map((v) => v.trim());
-      const propname = propval.shift();
-      propval = propval.map((str) => Number(str.replace(/[(),]/g, "")));
-
-      obj[name] = {
-        base_value: parseFloat(propValue),
-        pointsList: { [propname]: propval },
-      };
-    } else {
-      console.log(`Error length > 2 -> ${vals}`);
+    if (vals.length !== 2) {
+      console.error(`[${filename}] Error length > 2 -> ${vals}`);
+      return null;
     }
+
+    const [name, propValue] = vals[0].split(" ").map((v) => v.trim());
+    let propval = vals[1].split(" ").map((v) => v.trim());
+    const propname = propval.shift();
+    propval = propval.map((str) => Number(str.replace(/[(),]/g, "")));
+
+    obj[name] = {
+      base_value: parseFloat(propValue),
+      pointsList: { [propname]: propval },
+    };
   } else {
     const [name, propValue] = str.split(" ").map((v) => v.trim());
     obj[name] = { base_value: parseFloat(propValue) };
