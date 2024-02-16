@@ -212,7 +212,8 @@
     brush_img.src = `${pathToBrush}${brushname}.png`
 
     var script = document.createElement('script');
-    script.setAttribute('src', pathToBrush + brushname + '.myb.js');
+
+    script.setAttribute('src', '/brushlib.js/' + pathToBrush + brushname + '.myb.js');
     script.setAttribute('id', 'brushscript');
     document.documentElement.firstChild.appendChild(script);
     var loadbrush = "brush=new MypaintBrush(" + brushname + "); updateui(" + brushname + ")";
@@ -545,8 +546,8 @@
           </div>
         </div>
         <div class="image__brush">
-          <img src="/brushes/charcoal.png" alt="Brush Image" id="brush_img"
-            onerror="this.src = '/assets/img/image_invalid.svg'">
+          <img src="/brushlib.js/brushes/charcoal.png" alt="Brush Image" id="brush_img"
+            onerror="this.src = '/brushlib.js/assets/img/image_invalid.svg'">
         </div>
       </div>
       <div class="row option">
