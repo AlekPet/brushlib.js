@@ -15,3 +15,8 @@ http://www.wacom.com/CustomerCare/Plugin.aspx
 
 # Demo Pen (PointerEvent)
 [https://alekpet.github.io/brushlib.js/](https://alekpet.github.io/brushlib.js/)
+
+## Links
+Library : https://github.com/mypaint/libmypaint
+
+Brush library: https://github.com/mypaint/mypaint-brushes
