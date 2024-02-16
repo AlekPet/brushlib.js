@@ -1,193 +1,225 @@
-<HTML>
+<!DOCTYPE html>
+<html>
 
-<SCRIPT src="mybrush.js"></SCRIPT>
-<SCRIPT src="brushes/charcoal.myb.js"></SCRIPT>
-
+<script src="mybrush.js"></script>
+<script src="brushes/charcoal.myb.js"></script>
+<style>
+  #thecanvas {
+    touch-action: none
+  }
+</style>
 <!--
-Wacom Browser Plugin can be download from 
-http://www.wacom.com/CustomerCare/Plugin.aspx
-
-//-->
-<SCRIPT>
-  var surface,brush, brushname="charcoal";
+      Wacom Browser Plugin can be download from 
+      http://www.wacom.com/CustomerCare/Plugin.aspx
+      
+      //-->
+<script>
+  var surface, brush, brushname = "charcoal";
   var t1;//timer
   var canvas;
-  var canvasPos = {x:0.0, y:0.0};
+  var canvasPos = { x: 0.0, y: 0.0 };
   var lastX = 0.0;
   var lastY = 0.0;
   var iPad = navigator.userAgent.match(/iPad/i) != null;
-  function findPos(obj) 
-  {
-		var curleft = curtop = 0;
-		if (obj.offsetParent) {
-			curleft = obj.offsetLeft
-			curtop = obj.offsetTop
-			while (obj = obj.offsetParent) {
-				curleft += obj.offsetLeft
-				curtop += obj.offsetTop
-			}
-		}
-		return {x:curleft, y:curtop};
+  function findPos(obj) {
+    var curleft = curtop = 0;
+    if (obj.offsetParent) {
+      curleft = obj.offsetLeft
+      curtop = obj.offsetTop
+      while (obj = obj.offsetParent) {
+        curleft += obj.offsetLeft
+        curtop += obj.offsetTop
+      }
+    }
+    return { x: curleft, y: curtop };
   }
 
-	  
 
-  function onLoad()
-  { 
-		if ( null != document.getElementById('NotSupported') )
-		{
-			alert("Many apologies.  This demo is not supported on Internet Explorer. Please try Firefox!");
-			return;
-		}
-       	canvas = document.getElementById('thecanvas');
-		canvasPos = findPos(canvas);
-        surface=new MypaintSurface("thecanvas");
-		brush=new MypaintBrush(charcoal);  
-		updateui(charcoal);
-		
-        canvas.addEventListener( "touchmove", mousedrag, false );
-        canvas.addEventListener( "touchstart", mousedown, false );
-        canvas.addEventListener( "touchend", mouseup, false );		
+
+  function onLoad() {
+    if (null != document.getElementById('NotSupported')) {
+      alert("Many apologies.  This demo is not supported on Internet Explorer. Please try Firefox!");
+      return;
+    }
+    canvas = document.getElementById('thecanvas');
+    canvasPos = findPos(canvas);
+    surface = new MypaintSurface("thecanvas");
+    brush = new MypaintBrush(charcoal);
+    updateui(charcoal);
+
+    canvas.addEventListener("pointerdown", mousedown, false);
+    canvas.addEventListener("pointerup", mouseup, false);
+    canvas.addEventListener('pointermove', mousedrag);
   }
 
-function mousedown(evt)
-{
-  if (iPad) {
-        var te =  evt.touches.item(0);
-        lastX = te.clientX - canvasPos.x;
-        lastY = te.clientY - canvasPos.y;  
-        thecanvas.touchmove=mousedrag;
-  } else {
-		thecanvas.onmousemove=mousedrag;
-		lastX = evt.clientX - canvasPos.x;
-		lastY = evt.clientY - canvasPos.y;
+  function mousedown(evt) {
+    // console.log('down', evt)
+    if (iPad) {
+      var te = evt.touches.item(0);
+      lastX = te.clientX - canvasPos.x;
+      lastY = te.clientY - canvasPos.y;
+      thecanvas.addEventListener('pointermove', mousedrag);
+    } else {
+      thecanvas.addEventListener('pointermove', mousedrag);
+      lastX = evt.clientX - canvasPos.x;
+      lastY = evt.clientY - canvasPos.y;
+    }
+    t1 = (new Date()).getTime();
+    brush.new_stroke(lastX, lastY);
+    mousedrag(evt);
+    document.getElementById('divelapse').innerHTML = "X:" + lastX + " y:" + lastY;
   }
-        t1=(new Date()).getTime();		
-		brush.new_stroke(lastX,lastY);
-		mousedrag(evt);
-		document.getElementById('divelapse').innerHTML="X:"+lastX+" y:"+lastY;
-}
-function mouseup(evt)
-{
-  	canvas.onmousemove=null;
-  	updatestatus();
-}
-function mousemove(evt)
-{
- //  console.log(evt.clientX+' '+evt.clientY);
-}
-function mousedrag(evt)
-{
-		var plugin = document.embeds["wacom-plugin"];
-		var pressure;
-		var isEraser;
-		
-		var mousepressure=document.getElementById("mousepressure").value;
-		if (plugin)	{
-			pressure = plugin.pressure;
-			isEraser = plugin.isEraser;
-			if (isEraser==undefined) isEraser=false;
-			if (pressure==undefined || pressure==0) pressure=mousepressure /100; //for mouse
-		}else{
-			pressure = pressure=mousepressure /100; //for mouse
-			isEraser = false;
-		}
-       if (iPad) {
-          var te =  evt.touches.item(0);
-          curX = te.clientX - canvasPos.x;
-          curY = te.clientY - canvasPos.y;  
-          evt.preventDefault();
-          pressure = mousepressure /100;
-          isEraser=false;
-        } else {
-		  curX = evt.clientX - canvasPos.x;
-		  curY = evt.clientY - canvasPos.y;
-		}
-document.getElementById('divelapse').innerHTML="X:"+curX+" y:"+curY;
-        brush.stroke_to(surface,curX, curY, pressure, 90,0 , ((new Date()).getTime() - t1)/1000);
-		lastX = curX;
-		lastY = curY;
-}
-function updatestatus()
-{
-  
-  //how many dab is drawn for this stroke ?
-  document.getElementById('dab_count').innerHTML = surface.dab_count;
-  //how may calls to getcolor ?
-  document.getElementById('getcolor_count').innerHTML = surface.getcolor_count;
-  //time elpase for this stroke
-  document.getElementById('divelapse').innerHTML=(new Date()).getTime() - t1;
-  
-}
-function updateui(brushsetting)
-{
-  var color_h=document.getElementById("color_h");
-  var color_s=document.getElementById("color_s");
-  var color_v=document.getElementById("color_v");
-  
-  color_h.value=brushsetting.color_h.base_value *100;
-  color_s.value=brushsetting.color_s.base_value *100;
-  color_v.value=brushsetting.color_v.base_value *100;
-  
-  document.getElementById("colorbox").innerHTML=brushname;
+  function mouseup(evt) {
+    // console.log('up', evt)
+    thecanvas.ommousemove = null;
+    thecanvas.pointermove = null;
+    canvas.removeEventListener('pointermove', mousedrag);
 
-  colorchanged();
-}
-function colorchanged()
-{
-  var color_h=document.getElementById("color_h");
-  var color_s=document.getElementById("color_s");
-  var color_v=document.getElementById("color_v");
-  var bs=window[brushname];
-  bs.color_h.base_value=color_h.value / 100;
-  bs.color_s.base_value=color_s.value / 100;
-  bs.color_v.base_value=color_v.value / 100;
-  brush.readmyb_json(bs);
-  
-  var colorhsv=new ColorHSV(bs.color_h.base_value,bs.color_s.base_value,bs.color_v.base_value);
-  colorhsv.hsv_to_rgb_float();
-  
-  var colorbox=document.getElementById('colorbox');
-  var rr=Math.floor(colorhsv.r *255).toString(16); if (rr.length<2) rr="0"+rr;
-  var gg=Math.floor(colorhsv.g *255).toString(16); if (gg.length<2) gg="0"+gg;
-  var bb=Math.floor(colorhsv.b *255).toString(16); if (gg.length<2) gg="0"+gg;
-  colorbox.style.backgroundColor='#'+rr+gg+bb;
-  
-}
+    updatestatus();
+  }
+  function mousemove(evt) {
+    //  console.log(evt.clientX+' '+evt.clientY);
+  }
+  function mousedrag(evt) {
+    var plugin = document.embeds["wacom-plugin"];
+    var pressure;
+    var isEraser;
 
-function selectbrush()
-{
-   var bsel=document.getElementById("brushselector");
-   brushname=bsel.options[bsel.selectedIndex].value;
+    const { pressure: p, pointerType } = evt
+    var mousepressure = document.getElementById("mousepressure").value;
+    if (plugin) {
+      pressure = p;
+      isEraser = plugin.isEraser;
+      if (isEraser == undefined) isEraser = false;
+      if (pressure == undefined || pressure == 0) pressure = mousepressure / 100; //for mouse
+    } else {
+      pressure = p
+      if (pressure == undefined || pressure == 0) pressure = mousepressure / 100; //mousepressure / 100; //for mouse
+      isEraser = false;
 
-   var script=document.createElement('script');
-   script.setAttribute('src','brushes/'+brushname+'.myb.js');
-   script.setAttribute('id','brushscript');
-   document.documentElement.firstChild.appendChild(script);       
-   var loadbrush="brush=new MypaintBrush("+brushname+"); updateui("+brushname+")";
-   setTimeout(loadbrush, 1000);   //wait for one second to load the script
-}
-</SCRIPT>
-<BODY onload="onLoad();" bgcolor=silver>
-<CANVAS width=800 height=500 id=thecanvas onmousemove="mousemove(event)" onmousedown="mousedown(event)" onmouseup="mouseup(event)"></CANVAS>
-<br/><a href="https://github.com/yapcheahshen/brushlib.js">MyPaint BrushLib in Javascript </a>
-<embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" HIDDEN="TRUE"></embed>
-<br/>Brushes:<select id="brushselector" onchange="selectbrush()">
-<option value="charcoal">CharCoal</option>
-<option value="pen">Pen</option>
-<option value="calligraphy">Calligraphy</option>
-<option value="sewing">Sewing</option>
-<option value="short_grass">Short grass</option>
-</select>
-<br/>Pressure for Mouse: <input type="range" id="mousepressure" min="1" max="100" value="75"/>1.0
-<br/><span id="colorbox">&nsbp;&nsbp;</span>
-<br/>Hue: <input type="range" id="color_h" min="1" max="100" value="0" onchange="colorchanged()" />1.0
-<br/>Sat: <input type="range" id="color_s" min="1" max="100" value="0" onchange="colorchanged()" />1.0
-<br/>Vue: <input type="range" id="color_v" min="1" max="100" value="0" onchange="colorchanged()" />1.0
+    }
+    if (iPad) {
+      var te = evt.touches.item(0);
+      curX = te.clientX - canvasPos.x;
+      curY = te.clientY - canvasPos.y;
+      evt.preventDefault();
+      pressure = mousepressure / 100;
+      isEraser = false;
+    } else {
+      curX = evt.clientX - canvasPos.x;
+      curY = evt.clientY - canvasPos.y;
+    }
 
-<br>dabs:<span id="dab_count"></span>
-<br>getcolor:<span id="getcolor_count"></span>
-<br>elapse:<span id="divelapse"></span>
+    document.getElementById('divelapse').innerHTML = "X:" + curX + " Y:" + curY;
+    brush.stroke_to(surface, curX, curY, pressure, 90, 0, ((new Date()).getTime() - t1) / 1000);
+    lastX = curX;
+    lastY = curY;
+  }
+  function updatestatus() {
 
-</BODY>
-</HTML>
+    //how many dab is drawn for this stroke ?
+    document.getElementById('dab_count').innerHTML = surface.dab_count;
+    //how may calls to getcolor ?
+    document.getElementById('getcolor_count').innerHTML = surface.getcolor_count;
+    //time elpase for this stroke
+    document.getElementById('divelapse').innerHTML = (new Date()).getTime() - t1;
+
+  }
+  function updateui(brushsetting) {
+    var color_h = document.getElementById("color_h");
+    var color_s = document.getElementById("color_s");
+    var color_v = document.getElementById("color_v");
+
+    color_h.value = brushsetting.color_h.base_value * 100;
+    color_s.value = brushsetting.color_s.base_value * 100;
+    color_v.value = brushsetting.color_v.base_value * 100;
+
+    document.getElementById("colorbox").innerHTML = brushname;
+
+    colorchanged();
+  }
+  function colorchanged() {
+    var color_h = document.getElementById("color_h");
+    var color_s = document.getElementById("color_s");
+    var color_v = document.getElementById("color_v");
+    var bs = window[brushname];
+    bs.color_h.base_value = color_h.value / 100;
+    bs.color_s.base_value = color_s.value / 100;
+    bs.color_v.base_value = color_v.value / 100;
+    brush.readmyb_json(bs);
+
+    var colorhsv = new ColorHSV(bs.color_h.base_value, bs.color_s.base_value, bs.color_v.base_value);
+    colorhsv.hsv_to_rgb_float();
+
+    var colorbox = document.getElementById('colorbox');
+    var rr = Math.floor(colorhsv.r * 255).toString(16); if (rr.length < 2) rr = "0" + rr;
+    var gg = Math.floor(colorhsv.g * 255).toString(16); if (gg.length < 2) gg = "0" + gg;
+    var bb = Math.floor(colorhsv.b * 255).toString(16); if (gg.length < 2) gg = "0" + gg;
+    colorbox.style.backgroundColor = '#' + rr + gg + bb;
+
+  }
+
+  function selectbrush() {
+    var bsel = document.getElementById("brushselector");
+    brushname = bsel.options[bsel.selectedIndex].value;
+
+    var script = document.createElement('script');
+    script.setAttribute('src', 'brushes/' + brushname + '.myb.js');
+    script.setAttribute('id', 'brushscript');
+    document.documentElement.firstChild.appendChild(script);
+    var loadbrush = "brush=new MypaintBrush(" + brushname + "); updateui(" + brushname + ")";
+
+    setTimeout(loadbrush, 1000);   //wait for one second to load the script
+  }
+</script>
+
+<body onload="onLoad();" style="background: silver">
+  <canvas width="800" height="500" id="thecanvas" onmousemove="mousemove(event)" onmousedown="mousedown(event)"
+    onmouseup="mouseup(event)"></canvas>
+  <br />
+  <a href="https://github.com/yapcheahshen/brushlib.js">MyPaint BrushLib in Javascript </a>
+  <embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" HIDDEN="TRUE"></embed>
+
+  <br />Brushes:<select id="brushselector" onchange="selectbrush()">
+    <option value="b000">B000</option>
+    <option value="brush">Brush</option>
+    <option value="calligraphy">Calligraphy</option>
+    <option value="charcoal">Charcoal</option>
+    <option value="coarse_bulk_1">Coarse_bulk_1</option>
+    <option value="eraser">Eraser</option>
+    <option value="fur">Fur</option>
+    <option value="glow">Glow</option>
+    <option value="impressionism">Impressionism</option>
+    <option value="leaves">Leaves</option>
+    <option value="maobi">Maobi</option>
+    <option value="pen">Pen</option>
+    <option value="pencil">Pencil</option>
+    <option value="sewing">Sewing</option>
+    <option value="short_grass">Short_grass</option>
+    <option value="texture_03">Texture_03</option>
+    <option value="texture_06">Texture_06</option>
+    <option value="watercolor">Watercolor</option>
+  </select>
+  <br />Pressure for Mouse: <input type="range" id="mousepressure" min="1" max="100" value="75" />1.0
+  <br /><span id="colorbox">&nsbp;&nsbp;</span>
+  <br />Hue: <input type="range" id="color_h" min="1" max="100" value="0" onchange="colorchanged()" />1.0
+  <br />Sat: <input type="range" id="color_s" min="1" max="100" value="0" onchange="colorchanged()" />1.0
+  <br />Vue: <input type="range" id="color_v" min="1" max="100" value="0" onchange="colorchanged()" />1.0
+
+  <br>dabs:<span id="dab_count"></span>
+  <br>getcolor:<span id="getcolor_count"></span>
+  <br>elapse:<span id="divelapse"></span>
+
+  <!-- let mybjs={};
+    let pen = {} // object copy from site
+
+  for(let prop in pen.settings){
+      let {base_value, inputs: pointsList} = pen.settings[prop]
+      if(Object.keys(pointsList).length)
+      mybjs[prop] = {base_value, pointsList};
+      else mybjs[prop] = {base_value};
+  } -->
+
+</body>
+
+</html>

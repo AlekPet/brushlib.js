@@ -1,4 +1,4 @@
-var texture-03={
+var texture_03={
 opaque:{base_value:1.000},
 opaque_multiply:{base_value:0.000,pointsList:{pressure:[0.000,0.000,1.000,1.000]}},
 opaque_linearize:{base_value:0.900},
