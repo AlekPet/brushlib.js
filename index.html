@@ -1,237 +1,24 @@
 <!DOCTYPE html>
 <html>
 
-<script src="mybrush.js"></script>
-<script src="brushes/charcoal.myb.js"></script>
-<style>
-  body {
-    background: silver;
-  }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width , initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css">
+  <script src="mybrush.js"></script>
+  <script src="brushes/charcoal.myb.js"></script>
+  <script src="js/main.js"></script>
+</head>
 
-  #thecanvas {
-    touch-action: none
-  }
-
-  .box {
-    max-width: 800px;
-  }
-
-  .box,
-  .column {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  .row {
-    display: flex;
-    gap: 5px;
-  }
-
-  .option__label {
-    background: gainsboro;
-    padding: 3px;
-    flex: 1 1 30%;
-  }
-
-  .option__input {
-    text-align: center;
-    background: darkgray;
-    flex: 1 1 70%;
-  }
-
-  .select__brush {
-    align-items: center;
-    gap: 20px;
-  }
-
-  .image__brush {
-    min-width: 100px;
-  }
-</style>
-<!--
-      Wacom Browser Plugin can be download from 
-      http://www.wacom.com/CustomerCare/Plugin.aspx
-      
-      //-->
-<script>
-  var surface, brush, brushname = "charcoal";
-  var t1;//timer
-  var canvas;
-  var canvasPos = { x: 0.0, y: 0.0 };
-  var lastX = 0.0;
-  var lastY = 0.0;
-  var iPad = navigator.userAgent.match(/iPad/i) != null;
-  function findPos(obj) {
-    var curleft = curtop = 0;
-    if (obj.offsetParent) {
-      curleft = obj.offsetLeft
-      curtop = obj.offsetTop
-      while (obj = obj.offsetParent) {
-        curleft += obj.offsetLeft
-        curtop += obj.offsetTop
-      }
-    }
-    return { x: curleft, y: curtop };
-  }
-
-
-
-  function onLoad() {
-    if (null != document.getElementById('NotSupported')) {
-      alert("Many apologies.  This demo is not supported on Internet Explorer. Please try Firefox!");
-      return;
-    }
-    canvas = document.getElementById('thecanvas');
-    canvasPos = findPos(canvas);
-    surface = new MypaintSurface("thecanvas");
-    brush = new MypaintBrush(charcoal);
-    updateui(charcoal);
-
-    canvas.addEventListener("pointerdown", mousedown, false);
-    canvas.addEventListener("pointerup", mouseup, false);
-    canvas.addEventListener('pointermove', mousedrag);
-  }
-
-  function mousedown(evt) {
-    // console.log('down', evt)
-    if (iPad) {
-      var te = evt.touches.item(0);
-      lastX = te.clientX - canvasPos.x;
-      lastY = te.clientY - canvasPos.y;
-      thecanvas.addEventListener('pointermove', mousedrag);
-    } else {
-      thecanvas.addEventListener('pointermove', mousedrag);
-      lastX = evt.clientX - canvasPos.x;
-      lastY = evt.clientY - canvasPos.y;
-    }
-    t1 = (new Date()).getTime();
-    brush.new_stroke(lastX, lastY);
-    mousedrag(evt);
-    document.getElementById('divelapse').innerHTML = "X:" + lastX + " y:" + lastY;
-  }
-  function mouseup(evt) {
-    // console.log('up', evt)
-    thecanvas.ommousemove = null;
-    thecanvas.pointermove = null;
-    canvas.removeEventListener('pointermove', mousedrag);
-
-    updatestatus();
-  }
-  function mousemove(evt) {
-    //  console.log(evt.clientX+' '+evt.clientY);
-  }
-  function mousedrag(evt) {
-    var plugin = document.embeds["wacom-plugin"];
-    var pressure;
-    var isEraser;
-
-    const { pressure: p, pointerType } = evt
-    var mousepressure = document.getElementById("mousepressure").value;
-    if (plugin) {
-      pressure = p;
-      isEraser = plugin.isEraser;
-      if (isEraser == undefined) isEraser = false;
-      if (pressure == undefined || pressure == 0) pressure = mousepressure / 100; //for mouse
-    } else {
-      pressure = p
-      if (pressure == undefined || pressure == 0) pressure = mousepressure / 100; //mousepressure / 100; //for mouse
-      isEraser = false;
-
-    }
-    if (iPad) {
-      var te = evt.touches.item(0);
-      curX = te.clientX - canvasPos.x;
-      curY = te.clientY - canvasPos.y;
-      evt.preventDefault();
-      pressure = mousepressure / 100;
-      isEraser = false;
-    } else {
-      curX = evt.clientX - canvasPos.x;
-      curY = evt.clientY - canvasPos.y;
-    }
-
-    document.getElementById('divelapse').innerHTML = "X:" + curX + " Y:" + curY;
-    brush.stroke_to(surface, curX, curY, pressure, 90, 0, ((new Date()).getTime() - t1) / 1000);
-    lastX = curX;
-    lastY = curY;
-  }
-  function updatestatus() {
-
-    //how many dab is drawn for this stroke ?
-    document.getElementById('dab_count').innerHTML = surface.dab_count;
-    //how may calls to getcolor ?
-    document.getElementById('getcolor_count').innerHTML = surface.getcolor_count;
-    //time elpase for this stroke
-    document.getElementById('divelapse').innerHTML = (new Date()).getTime() - t1;
-
-  }
-  function updateui(brushsetting) {
-    var color_h = document.getElementById("color_h");
-    var color_s = document.getElementById("color_s");
-    var color_v = document.getElementById("color_v");
-
-    color_h.value = brushsetting.color_h.base_value * 100;
-    color_s.value = brushsetting.color_s.base_value * 100;
-    color_v.value = brushsetting.color_v.base_value * 100;
-
-    document.getElementById("colorbox").innerHTML = brushname;
-
-    colorchanged();
-  }
-  function colorchanged() {
-    var color_h = document.getElementById("color_h");
-    var color_s = document.getElementById("color_s");
-    var color_v = document.getElementById("color_v");
-    var bs = window[brushname];
-    bs.color_h.base_value = color_h.value / 100;
-    bs.color_s.base_value = color_s.value / 100;
-    bs.color_v.base_value = color_v.value / 100;
-    brush.readmyb_json(bs);
-
-    var colorhsv = new ColorHSV(bs.color_h.base_value, bs.color_s.base_value, bs.color_v.base_value);
-    colorhsv.hsv_to_rgb_float();
-
-    var colorbox = document.getElementById('colorbox');
-    var rr = Math.floor(colorhsv.r * 255).toString(16); if (rr.length < 2) rr = "0" + rr;
-    var gg = Math.floor(colorhsv.g * 255).toString(16); if (gg.length < 2) gg = "0" + gg;
-    var bb = Math.floor(colorhsv.b * 255).toString(16); if (gg.length < 2) gg = "0" + gg;
-    colorbox.style.backgroundColor = '#' + rr + gg + bb;
-
-  }
-
-  function selectbrush() {
-    var bsel = document.getElementById("brushselector");
-    var brush_img = document.getElementById("brush_img");
-    brushname = bsel.options[bsel.selectedIndex].value;
-
-    if (brushname === 'separator') return
-
-    const pathToBrush = bsel.options[bsel.selectedIndex].dataset.path
-
-    brush_img.src = `${pathToBrush}${brushname}.png`
-
-    var script = document.createElement('script');
-    script.setAttribute('src', '/brushlib.js/' + pathToBrush + brushname + '.myb.js');
-    script.setAttribute('id', 'brushscript');
-    document.documentElement.firstChild.appendChild(script);
-    var loadbrush = "brush=new MypaintBrush(" + brushname + "); updateui(" + brushname + ")";
-
-    setTimeout(loadbrush, 1000);   //wait for one second to load the script
-  }
-</script>
-
-<body onload="onLoad();">
-
+<body>
   <div class="box">
     <div class="column">
       <div class="box__canvas">
-        <canvas width="800" height="500" id="thecanvas" onmousemove="mousemove(event)" onmousedown="mousedown(event)"
-          onmouseup="mouseup(event)"></canvas>
+        <canvas width="800" height="500" id="thecanvas">Canvas not support your browser!</canvas>
       </div>
       <div>
         <a href="https://github.com/yapcheahshen/brushlib.js">MyPaint BrushLib in Javascript </a>
-        <embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" HIDDEN="TRUE"></embed>
+        <embed name="wacom-plugin" id="wacom-plugin" type="application/x-wacom-tablet" hidden></embed>
       </div>
     </div>
     <div class="column">
@@ -239,11 +26,11 @@
         <div class="option__label">Brushes:</div>
         <div class="option__input">
           <div>
-            <select id="brushselector" onchange="selectbrush()">
+            <select id="brushselector">
               <option value="b000" data-path="brushes/">B000</option>
               <option value="brush" data-path="brushes/">Brush</option>
               <option value="calligraphy" data-path="brushes/">Calligraphy</option>
-              <option value="charcoal" data-path="brushes/">Charcoal</option>
+              <option value="charcoal" data-path="brushes/" selected>Charcoal</option>
               <option value="coarse_bulk_1" data-path="brushes/">Coarse_bulk_1</option>
               <option value="eraser" data-path="brushes/">Eraser</option>
               <option value="fur" data-path="brushes/">Fur</option>
@@ -258,7 +45,7 @@
               <option value="texture_03" data-path="brushes/">Texture_03</option>
               <option value="texture_06" data-path="brushes/">Texture_06</option>
               <option value="watercolor" data-path="brushes/">Watercolor</option>
-              <option value="separator">--------- My brushes ---------</option> -->
+              <option value="separator">--------- My brushes ---------</option>
               <!-- my -->
               <option value="_Opaque100" data-path="08_save/">_Opaque100</option>
               <option value="pixel1" data-path="08_save/">Pixel1</option>
@@ -553,23 +340,22 @@
         <div class="option__label">Pressure for Mouse:</div>
         <div class="option__input">
           <input type="range" id="mousepressure" min="1" max="100" value="75" />1.0
-          <p><span id="colorbox">&nsbp;&nsbp;</span></p>
+          <p>
+            <span id="colorbox"></span>
+          </p>
         </div>
       </div>
       <div class="row option">
         <div class="option__label">Hue:</div>
-        <div class="option__input"><input type="range" id="color_h" min="1" max="100" value="0"
-            onchange="colorchanged()" />1.0</div>
+        <div class="option__input"><input type="range" id="color_h" min="1" max="100" value="0" />1.0</div>
       </div>
       <div class="row option">
         <div class="option__label">Sat</div>
-        <div class="option__input"><input type="range" id="color_s" min="1" max="100" value="0"
-            onchange="colorchanged()" />1.0</div>
+        <div class="option__input"><input type="range" id="color_s" min="1" max="100" value="0" />1.0</div>
       </div>
       <div class="row option">
         <div class="option__label">Vue</div>
-        <div class="option__input"><input type="range" id="color_v" min="1" max="100" value="0"
-            onchange="colorchanged()" />1.0</div>
+        <div class="option__input"><input type="range" id="color_v" min="1" max="100" value="0" />1.0</div>
       </div>
       <div class="row option">
         <div class="option__label">dabs:</div>
