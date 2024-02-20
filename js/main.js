@@ -25,7 +25,8 @@ class Manager {
 
     this.surface;
     this.brush;
-    this.brushname = "charcoal";
+    this.brushName = "charcoal";
+    this.currentBrushSetting = {};
     this.t1;
     this.canvas;
     this.canvasPos = { x: 0.0, y: 0.0 };
@@ -35,22 +36,26 @@ class Manager {
     this.onLoad();
   }
 
-  onLoad() {
+  async onLoad() {
     if (null != document.getElementById("NotSupported")) {
       alert(
         "Many apologies.  This demo is not supported on Internet Explorer. Please try Firefox!"
       );
       return;
     }
+
     this.canvas = document.getElementById("thecanvas");
     this.canvasPos = findPos(this.canvas);
+    this.surface = new MypaintSurface("thecanvas");
 
-    this.surface = window.surface = new MypaintSurface("thecanvas");
-    this.brush = new MypaintBrush(charcoal);
+    this.currentBrushSetting = await this.getBrushSetting(
+      `brushes/${this.brushName}`
+    );
+    this.brush = new MypaintBrush(this.currentBrushSetting, this.surface);
 
-    this.pointerMoveHandler = this.mousedrag.bind(this);
-    this.canvas.addEventListener("pointerdown", this.mousedown.bind(this));
-    this.canvas.addEventListener("pointerup", this.mouseup.bind(this));
+    this.pointerMoveHandler = this.pointermove.bind(this);
+    this.canvas.addEventListener("pointerdown", this.pointerdown.bind(this));
+    this.canvas.addEventListener("pointerup", this.pointerup.bind(this));
     this.canvas.addEventListener("pointermove", this.pointerMoveHandler);
 
     // --- color h,s,v
@@ -66,6 +71,10 @@ class Manager {
     this.divelapse = document.getElementById("divelapse");
     // --
     this.mousepressure = document.getElementById("mousepressure");
+    this.mousepressure.addEventListener(
+      "change",
+      this.pressurechanged.bind(this)
+    );
     // ---
     this.dab_count = document.getElementById("dab_count");
     this.getcolor_count = document.getElementById("getcolor_count");
@@ -77,11 +86,16 @@ class Manager {
 
     this.brush_img = document.getElementById("brush_img");
 
-    this.updateui(charcoal);
+    this.brush_img.onerror = function () {
+      this.src = "/brushlib.js/assets/img/image_invalid.svg";
+    };
+
+    this.updateui(this.currentBrushSetting);
   }
 
-  mousedown(evt) {
+  pointerdown(evt) {
     // console.log('down', evt)
+
     if (this.iPad) {
       const touchEvt = evt.touches.item(0);
       this.lastX = touchEvt.clientX - this.canvasPos.x;
@@ -95,26 +109,24 @@ class Manager {
     this.t1 = new Date().getTime();
     this.brush.new_stroke(this.lastX, this.lastY);
 
-    this.mousedrag(evt);
+    this.pointermove(evt);
     this.divelapse.innerHTML = `X: ${this.lastX} Y: ${this.lastY}`;
   }
 
-  mouseup(evt) {
+  pointerup(evt) {
     // console.log("up", evt);
     this.canvas.removeEventListener("pointermove", this.pointerMoveHandler);
 
     this.updatestatus();
   }
 
-  mousedrag(evt) {
+  pointermove(evt) {
     const plugin = document.embeds["wacom-plugin"];
     let { pressure: pressurePointer, pointerType, button } = evt;
     let pressure;
     let isEraser;
     let curX = 0;
     let curY = 0;
-
-    console.log(pressurePointer, pointerType, button, evt.touches);
 
     // Pen
     if (pointerType === "pen") {
@@ -153,6 +165,8 @@ class Manager {
     //   isEraser = false;
     // }
 
+    this.mousepressure.nextElementSibling.textContent = pressure;
+
     this.divelapse.innerHTML = `X: ${curX} Y: ${curY}`;
 
     const time = (new Date().getTime() - this.t1) / 1000;
@@ -171,22 +185,40 @@ class Manager {
     this.divelapse.innerHTML = new Date().getTime() - this.t1;
   }
 
-  updateui(brushsetting) {
-    this.color_h.value = brushsetting.color_h.base_value * 100;
-    this.color_s.value = brushsetting.color_s.base_value * 100;
-    this.color_v.value = brushsetting.color_v.base_value * 100;
+  updateui() {
+    this.color_h.value = this.currentBrushSetting.color_h.base_value * 100;
+    this.color_s.value = this.currentBrushSetting.color_s.base_value * 100;
+    this.color_v.value = this.currentBrushSetting.color_v.base_value * 100;
 
-    this.colorbox.innerHTML = this.brushname;
+    this.color_h.nextElementSibling.textContent = this.color_h.value;
+    this.color_s.nextElementSibling.textContent = this.color_s.value;
+    this.color_v.nextElementSibling.textContent = this.color_v.value;
 
-    this.colorchanged();
+    this.colorbox.innerHTML = this.brushName;
+
+    //this.colorchanged();
+  }
+
+  pressurechanged() {
+    this.mousepressure.nextElementSibling.textContent = (
+      this.mousepressure.value / 100
+    ).toFixed(2);
   }
 
   colorchanged() {
-    const bs = window[this.brushname];
+    const bs = this.currentBrushSetting;
+
     bs.color_h.base_value = this.color_h.value / 100;
     bs.color_s.base_value = this.color_s.value / 100;
     bs.color_v.base_value = this.color_v.value / 100;
     this.brush.readmyb_json(bs);
+
+    this.color_h.nextElementSibling.textContent =
+      bs.color_h.base_value.toFixed(2);
+    this.color_s.nextElementSibling.textContent =
+      bs.color_s.base_value.toFixed(2);
+    this.color_v.nextElementSibling.textContent =
+      bs.color_v.base_value.toFixed(2);
 
     const colorhsv = new ColorHSV(
       bs.color_h.base_value,
@@ -206,27 +238,31 @@ class Manager {
     this.colorbox.style.backgroundColor = "#" + rr + gg + bb;
   }
 
-  selectbrush() {
-    this.brushname = this.bsel.options[this.bsel.selectedIndex].value;
+  async getBrushSetting(pathToBrush) {
+    const brushGetData = await fetch(`/brushlib.js/${pathToBrush}.myb.json`);
+    const brushSetting = await brushGetData.json();
 
-    if (this.brushname === "separator") return;
+    return brushSetting;
+  }
 
+  async selectbrush() {
+    const brushName = this.bsel.options[this.bsel.selectedIndex].value;
     const pathToBrush = this.bsel.options[this.bsel.selectedIndex].dataset.path;
 
-    this.brush_img.src = `${pathToBrush}${this.brushname}.png`;
+    if (brushName === "separator" || !pathToBrush) {
+      console.error("Not isset path dataset or brush name incorrect!");
+      return;
+    }
 
-    const script = document.createElement("script");
-    script.setAttribute(
-      "src",
-      "/brushlib.js/" + pathToBrush + this.brushname + ".myb.js"
-    );
-    script.setAttribute("id", "brushscript");
-    document.documentElement.firstChild.append(script);
+    this.brushName = brushName;
 
-    const loadbrush = `manager = new Manager();
-    manager.brush=new MypaintBrush(${this.brushname});
-    manager.updateui(${this.brushname});`;
-    setTimeout(loadbrush, 1000); //wait for one second to load the script
+    const pathToJsonBrush = `${pathToBrush}${this.brushName}`;
+    this.currentBrushSetting = await this.getBrushSetting(pathToJsonBrush);
+
+    this.brush = new MypaintBrush(this.currentBrushSetting, this.surface);
+    this.brush_img.src = `${pathToJsonBrush}.png`;
+
+    this.updateui();
   }
 }
 

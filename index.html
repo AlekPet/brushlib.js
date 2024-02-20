@@ -5,8 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width , initial-scale=1.0" />
   <link rel="stylesheet" href="css/style.css">
-  <script src="mybrush.js"></script>
-  <script src="brushes/charcoal.myb.js"></script>
+  <script src="js/mybrush.js"></script>
   <script src="js/main.js"></script>
 </head>
 
@@ -339,7 +338,7 @@
       <div class="row option">
         <div class="option__label">Pressure for Mouse:</div>
         <div class="option__input">
-          <input type="range" id="mousepressure" min="1" max="100" value="75" />1.0
+          <input type="range" id="mousepressure" min="1" max="100" value="75" />1.0 | Current: <span>0.75</span>
           <p>
             <span id="colorbox"></span>
           </p>
@@ -347,15 +346,23 @@
       </div>
       <div class="row option">
         <div class="option__label">Hue:</div>
-        <div class="option__input"><input type="range" id="color_h" min="1" max="100" value="0" />1.0</div>
+        <div class="option__input">
+          <input type="range" id="color_h" min="1" max="100" value="0" />1.0 |
+          Current: <span>0</span>
+        </div>
       </div>
       <div class="row option">
         <div class="option__label">Sat</div>
-        <div class="option__input"><input type="range" id="color_s" min="1" max="100" value="0" />1.0</div>
+        <div class="option__input">
+          <input type="range" id="color_s" min="1" max="100" value="0" />1.0 |
+          Current: <span>0</span>
+        </div>
       </div>
       <div class="row option">
         <div class="option__label">Vue</div>
-        <div class="option__input"><input type="range" id="color_v" min="1" max="100" value="0" />1.0</div>
+        <div class="option__input"><input type="range" id="color_v" min="1" max="100" value="0" />1.0 |
+          Current: <span>0</span>
+        </div>
       </div>
       <div class="row option">
         <div class="option__label">dabs:</div>
