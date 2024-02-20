@@ -571,7 +571,7 @@
     };
   }
 
-  function MypaintBrush(brushsetting) {
+  function MypaintBrush(brushsetting, surface) {
     this.states = new Array(STATE_COUNT);
     this.settings = new Array(BRUSH_SETTINGS_COUNT);
     this.settings_value = new Array(BRUSH_SETTINGS_COUNT);
@@ -661,7 +661,7 @@
         try {
           var idx = eval("BRUSH_" + setting.toUpperCase());
         } catch (error) {
-          console.log(setting.toUpperCase());
+          console.error(`Not found: ${setting.toUpperCase()}`);
           continue;
         }
 

@@ -13,10 +13,19 @@
 const fs = require("fs");
 const path = require("path");
 
-const pathBrushes = path.join(__dirname, "08");
-const saveBrushes = path.join(__dirname, "08_save");
+const srcDirMyb = process.argv[2] ? process.argv[2] : "08";
+const saveDir = process.argv[3] ? process.argv[saveDir] : `${srcDirMyb}_save`;
+
+const pathBrushes = path.join(__dirname, srcDirMyb);
+const saveBrushes = path.join(__dirname, saveDir);
+
+if (!fs.existsSync(pathBrushes)) {
+  console.error(new Error(`File path not exists "${pathBrushes}"`));
+  process.exit(1);
+}
 
 const filterPropsMissing = ["#"];
+const useJsonFile = true;
 
 function isinValidProp(str) {
   for (let p of filterPropsMissing) {
@@ -108,9 +117,14 @@ fs.readdir(
           options: { filename },
         } = response;
 
-        const dataToText = `var ${filename} = ${JSON.stringify(data)}`;
+        const dataToText = !useJsonFile
+          ? `var ${filename} = ${JSON.stringify(data)}`
+          : JSON.stringify(data);
         const fileSave = fs.createWriteStream(
-          path.join(saveBrushes, `${filename}.myb.js`)
+          path.join(
+            saveBrushes,
+            `${filename}.myb.${!useJsonFile ? "js" : "json"}`
+          )
         );
 
         optionValues += `<option value="${filename}" data-path="08_save/">${
