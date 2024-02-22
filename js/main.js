@@ -139,6 +139,7 @@ class Manager {
       this.src = "/brushlib.js/assets/img/image_invalid.svg";
     };
 
+
     this.cls = document.getElementById("cls_canvas");
     this.cls.addEventListener("click", this.clearCanvas.bind(this));
 
@@ -251,8 +252,7 @@ class Manager {
     this.color_v.nextElementSibling.textContent = this.color_v.value;
 
     this.colorbox.innerHTML = this.brushName;
-
-    //this.colorchanged();
+    this.colorchanged();
   }
 
   pressurechanged() {

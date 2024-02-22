@@ -107,6 +107,7 @@
   const BRUSH_VERSION = 39;
   const BRUSH_ANTI_ALIASING = 40;
   const BRUSH_SETTINGS_COUNT = 41;
+
   //obsolute
   const BRUSH_ADAPT_COLOR_FROM_IMAGE = 1000;
   const BRUSH_CHANGE_RADIUS = 1000;
@@ -414,6 +415,7 @@
     this.b = 0;
     this.dab_count = 0; //javascript only
     this.getcolor_count = 0;
+
     if (typeof divname === "string") {
       this.canvas = document.getElementById(divname);
     } else if (divname instanceof HTMLCanvasElement) {
