@@ -419,7 +419,7 @@
     } else if (divname instanceof HTMLCanvasElement) {
       this.canvas = divname;
     }
-    this.context = this.canvas.getContext("2d");
+    this.context = this.canvas.getContext("2d", { willReadFrequently: true });
     this.context.fillStyle = "rgba(255,255,255,255)";
     this.context.fillRect(
       0,

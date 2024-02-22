@@ -14,6 +14,17 @@ function findPos(obj) {
   return { x: curleft, y: curtop };
 }
 
+async function getDataJSON(url) {
+  try {
+    const response = await fetch(url);
+    const jsonData = await response.json();
+
+    return jsonData;
+  } catch (error) {
+    return new Error(error);
+  }
+}
+
 class Manager {
   _instance = null;
   constructor() {
@@ -22,6 +33,8 @@ class Manager {
     }
 
     Manager._instance = this;
+
+    this.basePath = `/brushlib.js`;
 
     this.surface;
     this.brush;
@@ -52,8 +65,8 @@ class Manager {
     this.canvasPos = findPos(this.canvas);
     this.surface = new MypaintSurface(this.canvas);
 
-    this.currentBrushSetting = await this.getBrushSetting(
-      `brushes/${this.brushName}`
+    this.currentBrushSetting = await getDataJSON(
+      `${this.basePath}/brushes/${this.brushName}.myb.json`
     );
     this.brush = new MypaintBrush(this.currentBrushSetting, this.surface);
 
@@ -88,6 +101,38 @@ class Manager {
     this.bsel = document.getElementById("brushselector");
     this.bsel.addEventListener("change", this.selectbrush.bind(this));
 
+    const brushesData = await getDataJSON(
+      `${this.basePath}/js/brushes_data.json`
+    );
+
+    let currentDir = null;
+    Object.keys(brushesData).forEach((dir) => {
+      const currentDirVals = brushesData[dir];
+      if (!currentDir) currentDir = dir;
+
+      if (currentDir !== dir) {
+        const option = document.createElement("option");
+        option.value = "separator";
+        option.textContent = `-------------- ${dir} --------------`;
+        currentDir = dir;
+        this.bsel.append(option);
+      }
+
+      currentDirVals.forEach((brushData) => {
+        const { filename, path } = brushData;
+        const option = document.createElement("option");
+        option.value = filename;
+        option.textContent = filename[0].toUpperCase() + filename.slice(1);
+        option.dataset.path = `brushes/${path}/`;
+
+        if (filename === "charcoal") option.selected = true;
+
+        this.bsel.append(option);
+        currentDir = dir;
+      });
+    });
+
+    // ---
     this.brush_img = document.getElementById("brush_img");
 
     this.brush_img.onerror = function () {
@@ -249,13 +294,6 @@ class Manager {
     this.colorbox.style.backgroundColor = "#" + rr + gg + bb;
   }
 
-  async getBrushSetting(pathToBrush) {
-    const brushGetData = await fetch(`/brushlib.js/${pathToBrush}.myb.json`);
-    const brushSetting = await brushGetData.json();
-
-    return brushSetting;
-  }
-
   async selectbrush() {
     const brushName = this.bsel.options[this.bsel.selectedIndex].value;
     const pathToBrush = this.bsel.options[this.bsel.selectedIndex].dataset.path;
@@ -267,8 +305,8 @@ class Manager {
 
     this.brushName = brushName;
 
-    const pathToJsonBrush = `${pathToBrush}${this.brushName}`;
-    this.currentBrushSetting = await this.getBrushSetting(pathToJsonBrush);
+    const pathToJsonBrush = `${this.basePath}/${pathToBrush}${this.brushName}`;
+    this.currentBrushSetting = await getDataJSON(`${pathToJsonBrush}.myb.json`);
 
     this.brush = new MypaintBrush(this.currentBrushSetting, this.surface);
     this.brush_img.src = `${pathToJsonBrush}.png`;
