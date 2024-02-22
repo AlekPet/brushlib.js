@@ -105,7 +105,8 @@
   const BRUSH_ELLIPTICAL_DAB_ANGLE = 37;
   const BRUSH_DIRECTION_FILTER = 38;
   const BRUSH_VERSION = 39;
-  const BRUSH_SETTINGS_COUNT = 40;
+  const BRUSH_ANTI_ALIASING = 40;
+  const BRUSH_SETTINGS_COUNT = 41;
   //obsolute
   const BRUSH_ADAPT_COLOR_FROM_IMAGE = 1000;
   const BRUSH_CHANGE_RADIUS = 1000;
@@ -137,6 +138,8 @@
   const STATE_DECLINATION = 23;
   const STATE_ASCENSION = 24;
   const STATE_COUNT = 25;
+
+  const MAX_DTIME = 100; // 5
 
   function AssertException(message) {
     this.message = message;
@@ -411,10 +414,19 @@
     this.b = 0;
     this.dab_count = 0; //javascript only
     this.getcolor_count = 0;
-    var canvas = document.getElementById(divname);
-    this.context = canvas.getContext("2d");
+    if (typeof divname === "string") {
+      this.canvas = document.getElementById(divname);
+    } else if (divname instanceof HTMLCanvasElement) {
+      this.canvas = divname;
+    }
+    this.context = this.canvas.getContext("2d");
     this.context.fillStyle = "rgba(255,255,255,255)";
-    this.context.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    this.context.fillRect(
+      0,
+      0,
+      this.canvas.clientWidth,
+      this.canvas.clientHeight
+    );
 
     this.draw_dab = function (
       x,
@@ -492,6 +504,16 @@
       return;
     };
   }
+
+  MypaintSurface.prototype.clearCanvas = function () {
+    this.context.fillStyle = "rgba(255,255,255,255)";
+    this.context.fillRect(
+      0,
+      0,
+      this.canvas.clientWidth,
+      this.canvas.clientHeight
+    );
+  };
 
   function Mapping(inputcount) {
     this.inputs = inputcount;
@@ -1142,6 +1164,22 @@
     // the functions below will CLAMP most inputs
     colorhsv = new ColorHSV(color_h, color_s, color_v);
     colorhsv.hsv_to_rgb_float();
+
+    // Ant-alising
+    const current_fadeout_in_pixels = radius * (1.0 - hardness);
+    const min_fadeout_in_pixels = this.settings_value[BRUSH_ANTI_ALIASING];
+    if (current_fadeout_in_pixels < min_fadeout_in_pixels) {
+      const current_optical_radius = radius - ((1.0 - hardness) * radius) / 2.0;
+      const hardness_new =
+        (current_optical_radius - min_fadeout_in_pixels / 2.0) /
+        (current_optical_radius + min_fadeout_in_pixels / 2.0);
+      const radius_new = min_fadeout_in_pixels / (1.0 - hardness_new);
+
+      hardness = hardness_new;
+      radius = radius_new;
+    }
+    //
+
     return surface.draw_dab(
       x,
       y,
@@ -1313,7 +1351,8 @@
     var dist_todo = this.count_dabs_to(x, y, pressure, dtime);
 
     //if (dtime > 5 || dist_todo > 300) {
-    if (dtime > 5) {
+
+    if (dtime > MAX_DTIME) {
       /*
         TODO:
         if (dist_todo > 300) {

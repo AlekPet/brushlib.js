@@ -44,9 +44,13 @@ class Manager {
       return;
     }
 
-    this.canvas = document.getElementById("thecanvas");
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = 800;
+    this.canvas.height = 500;
+    document.querySelector(".box__canvas").append(this.canvas);
+
     this.canvasPos = findPos(this.canvas);
-    this.surface = new MypaintSurface("thecanvas");
+    this.surface = new MypaintSurface(this.canvas);
 
     this.currentBrushSetting = await this.getBrushSetting(
       `brushes/${this.brushName}`
@@ -90,7 +94,14 @@ class Manager {
       this.src = "/brushlib.js/assets/img/image_invalid.svg";
     };
 
+    this.cls = document.getElementById("cls_canvas");
+    this.cls.addEventListener("click", this.clearCanvas.bind(this));
+
     this.updateui(this.currentBrushSetting);
+  }
+
+  clearCanvas() {
+    this.surface.clearCanvas();
   }
 
   pointerdown(evt) {

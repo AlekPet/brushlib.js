@@ -1,4 +1,7 @@
 {
+  "anti_aliasing": {
+    "base_value": 1.0
+  },
   "opaque": { "base_value": 0.8 },
   "opaque_multiply": {
     "base_value": 0.0,
