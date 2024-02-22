@@ -4,6 +4,8 @@
   "description": "MyPaint brushlib in Javascript",
   "main": "brushConvert.js",
   "scripts": {
+    "conv": "node brushConvert.js convert",
+    "brushes": "node brushConvert getbrush",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
