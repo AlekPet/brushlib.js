@@ -414,12 +414,22 @@
     this.b = 0;
     this.dab_count = 0; //javascript only
     this.getcolor_count = 0;
+
     if (typeof divname === "string") {
       this.canvas = document.getElementById(divname);
+      this.context = this.canvas.getContext("2d", { willReadFrequently: true });
     } else if (divname instanceof HTMLCanvasElement) {
       this.canvas = divname;
+      this.context = this.canvas.getContext("2d", { willReadFrequently: true });
+    } else if (
+      typeof divname === "object" &&
+      divname.hasOwnProperty("contextTop")
+    ) {
+      // fabric.js
+      this.canvas = divname;
+      this.context = canvas.contextTop;
     }
-    this.context = this.canvas.getContext("2d", { willReadFrequently: true });
+
     this.context.fillStyle = "rgba(255,255,255,255)";
     this.context.fillRect(
       0,

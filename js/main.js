@@ -45,7 +45,7 @@ class Manager {
     this.canvasPos = { x: 0.0, y: 0.0 };
     this.lastX;
     this.lastY;
-    this.iPad = navigator.userAgent.match(/iPad/i) !== null;
+
     this.onLoad();
   }
 
@@ -152,14 +152,9 @@ class Manager {
   pointerdown(evt) {
     // console.log('down', evt)
 
-    if (this.iPad) {
-      const touchEvt = evt.touches.item(0);
-      this.lastX = touchEvt.clientX - this.canvasPos.x;
-      this.lastY = touchEvt.clientY - this.canvasPos.y;
-    } else {
-      this.lastX = evt.clientX - this.canvasPos.x;
-      this.lastY = evt.clientY - this.canvasPos.y;
-    }
+    this.lastX = evt.clientX - this.canvasPos.x;
+    this.lastY = evt.clientY - this.canvasPos.y;
+
     this.canvas.addEventListener("pointermove", this.pointerMoveHandler);
 
     this.t1 = new Date().getTime();
@@ -179,7 +174,7 @@ class Manager {
   pointermove(evt) {
     const plugin = document.embeds["wacom-plugin"];
     let { pressure: pressurePointer, pointerType, button } = evt;
-    let pressure;
+    let pressure = this.mousepressure.value / 100;
     let isEraser;
     let curX = 0;
     let curY = 0;
@@ -206,20 +201,9 @@ class Manager {
         pressure = this.mousepressure.value / 100;
       }
       isEraser = false;
-
       curX = evt.clientX - this.canvasPos.x;
       curY = evt.clientY - this.canvasPos.y;
     }
-
-    // Touch
-    // if (pointerType === "touch") {
-    //   const touchEvt = evt.touches.item(0);
-    //   curX = touchEvt.clientX - this.canvasPos.x;
-    //   curY = touchEvt.clientY - this.canvasPos.y;
-    //   evt.preventDefault();
-    //   pressure = this.mousepressure.value / 100;
-    //   isEraser = false;
-    // }
 
     this.mousepressure.nextElementSibling.textContent = pressure;
 
@@ -252,7 +236,7 @@ class Manager {
 
     this.colorbox.innerHTML = this.brushName;
 
-    //this.colorchanged();
+    this.colorchanged();
   }
 
   pressurechanged() {
