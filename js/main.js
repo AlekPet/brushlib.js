@@ -42,9 +42,6 @@ class Manager {
     this.currentBrushSetting = {};
     this.t1;
     this.canvas;
-    this.canvasPos = { x: 0.0, y: 0.0 };
-    this.lastX;
-    this.lastY;
 
     this.onLoad();
   }
@@ -62,7 +59,6 @@ class Manager {
     this.canvas.height = 500;
     document.querySelector(".box__canvas").append(this.canvas);
 
-    this.canvasPos = findPos(this.canvas);
     this.surface = new MypaintSurface(this.canvas);
 
     this.currentBrushSetting = await getDataJSON(
@@ -151,17 +147,15 @@ class Manager {
 
   pointerdown(evt) {
     // console.log('down', evt)
-
-    this.lastX = evt.clientX - this.canvasPos.x;
-    this.lastY = evt.clientY - this.canvasPos.y;
+    let curX = evt.clientX;
+    let curY = evt.clientY;
 
     this.canvas.addEventListener("pointermove", this.pointerMoveHandler);
 
     this.t1 = new Date().getTime();
-    this.brush.new_stroke(this.lastX, this.lastY);
+    this.brush.new_stroke(curX, curY);
 
-    this.pointermove(evt);
-    this.divelapse.innerHTML = `X: ${this.lastX} Y: ${this.lastY}`;
+    this.divelapse.innerHTML = `X: ${curX} Y: ${curY}`;
   }
 
   pointerup(evt) {
@@ -201,9 +195,10 @@ class Manager {
         pressure = this.mousepressure.value / 100;
       }
       isEraser = false;
-      curX = evt.clientX - this.canvasPos.x;
-      curY = evt.clientY - this.canvasPos.y;
     }
+
+    curX = evt.clientX;
+    curY = evt.clientY;
 
     this.mousepressure.nextElementSibling.textContent = pressure;
 
@@ -211,9 +206,6 @@ class Manager {
 
     const time = (new Date().getTime() - this.t1) / 1000;
     this.brush.stroke_to(this.surface, curX, curY, pressure, 90, 0, time);
-
-    this.lastX = curX;
-    this.lastY = curY;
   }
 
   updatestatus() {

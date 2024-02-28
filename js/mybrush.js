@@ -50,96 +50,103 @@
 
   const ACTUAL_RADIUS_MIN = 0.2;
   const ACTUAL_RADIUS_MAX = 800; // safety guard against radius like 1e20 and against rendering overload with unexpected brush dynamics
-  const INPUT_PRESSURE = 0;
-  const INPUT_SPEED1 = 1;
-  const INPUT_SPEED2 = 2;
-  const INPUT_RANDOM = 3;
-  const INPUT_STROKE = 4;
-  const INPUT_DIRECTION = 5;
-  const INPUT_TILT_DECLINATION = 6;
-  const INPUT_TILT_ASCENSION = 7;
-  const INPUT_CUSTOM = 8;
-  const INPUT_COUNT = 9;
+  const INPUT = {
+    PRESSURE: 0,
+    SPEED1: 1,
+    SPEED2: 2,
+    RANDOM: 3,
+    STROKE: 4,
+    DIRECTION: 5,
+    TILT_DECLINATION: 6,
+    TILT_ASCENSION: 7,
+    CUSTOM: 8,
+    COUNT: 9,
+  };
 
-  const BRUSH_OPAQUE = 0;
-  const BRUSH_OPAQUE_MULTIPLY = 1;
-  const BRUSH_OPAQUE_LINEARIZE = 2;
-  const BRUSH_RADIUS_LOGARITHMIC = 3;
-  const BRUSH_HARDNESS = 4;
-  const BRUSH_DABS_PER_BASIC_RADIUS = 5;
-  const BRUSH_DABS_PER_ACTUAL_RADIUS = 6;
-  const BRUSH_DABS_PER_SECOND = 7;
-  const BRUSH_RADIUS_BY_RANDOM = 8;
-  const BRUSH_SPEED1_SLOWNESS = 9;
-  const BRUSH_SPEED2_SLOWNESS = 10;
-  const BRUSH_SPEED1_GAMMA = 11;
-  const BRUSH_SPEED2_GAMMA = 12;
-  const BRUSH_OFFSET_BY_RANDOM = 13;
-  const BRUSH_OFFSET_BY_SPEED = 14;
-  const BRUSH_OFFSET_BY_SPEED_SLOWNESS = 15;
-  const BRUSH_SLOW_TRACKING = 16;
-  const BRUSH_SLOW_TRACKING_PER_DAB = 17;
-  const BRUSH_TRACKING_NOISE = 18;
-  const BRUSH_COLOR_HUE = 19;
-  const BRUSH_COLOR_H = 19;
-  const BRUSH_COLOR_SATURATION = 20;
-  const BRUSH_COLOR_S = 20;
-  const BRUSH_COLOR_VALUE = 21;
-  const BRUSH_COLOR_V = 21;
-  const BRUSH_CHANGE_COLOR_H = 22;
-  const BRUSH_CHANGE_COLOR_L = 23;
-  const BRUSH_CHANGE_COLOR_HSL_S = 24;
-  const BRUSH_CHANGE_COLOR_V = 25;
-  const BRUSH_CHANGE_COLOR_HSV_S = 26;
-  const BRUSH_SMUDGE = 27;
-  const BRUSH_SMUDGE_LENGTH = 28;
-  const BRUSH_SMUDGE_RADIUS_LOG = 29;
-  const BRUSH_ERASER = 30;
-  const BRUSH_STROKE_TRESHOLD = 31; // miss spelling in .myb file
-  const BRUSH_STROKE_THRESHOLD = 31;
-  const BRUSH_STROKE_DURATION_LOGARITHMIC = 32;
-  const BRUSH_STROKE_HOLDTIME = 33;
-  const BRUSH_CUSTOM_INPUT = 34;
-  const BRUSH_CUSTOM_INPUT_SLOWNESS = 35;
-  const BRUSH_ELLIPTICAL_DAB_RATIO = 36;
-  const BRUSH_ELLIPTICAL_DAB_ANGLE = 37;
-  const BRUSH_DIRECTION_FILTER = 38;
-  const BRUSH_VERSION = 39;
-  const BRUSH_ANTI_ALIASING = 40;
-  const BRUSH_SETTINGS_COUNT = 41;
-  //obsolute
-  const BRUSH_ADAPT_COLOR_FROM_IMAGE = 1000;
-  const BRUSH_CHANGE_RADIUS = 1000;
-  const BRUSH_GROUP = 1000;
+  const BRUSH = {
+    OPAQUE: 0,
+    OPAQUE_MULTIPLY: 1,
+    OPAQUE_LINEARIZE: 2,
+    RADIUS_LOGARITHMIC: 3,
+    HARDNESS: 4,
+    DABS_PER_BASIC_RADIUS: 5,
+    DABS_PER_ACTUAL_RADIUS: 6,
+    DABS_PER_SECOND: 7,
+    RADIUS_BY_RANDOM: 8,
+    SPEED1_SLOWNESS: 9,
+    SPEED2_SLOWNESS: 10,
+    SPEED1_GAMMA: 11,
+    SPEED2_GAMMA: 12,
+    OFFSET_BY_RANDOM: 13,
+    OFFSET_BY_SPEED: 14,
+    OFFSET_BY_SPEED_SLOWNESS: 15,
+    SLOW_TRACKING: 16,
+    SLOW_TRACKING_PER_DAB: 17,
+    TRACKING_NOISE: 18,
+    COLOR_HUE: 19,
+    COLOR_H: 19,
+    COLOR_SATURATION: 20,
+    COLOR_S: 20,
+    COLOR_VALUE: 21,
+    COLOR_V: 21,
+    CHANGE_COLOR_H: 22,
+    CHANGE_COLOR_L: 23,
+    CHANGE_COLOR_HSL_S: 24,
+    CHANGE_COLOR_V: 25,
+    CHANGE_COLOR_HSV_S: 26,
+    SMUDGE: 27,
+    SMUDGE_LENGTH: 28,
+    SMUDGE_RADIUS_LOG: 29,
+    ERASER: 30,
+    STROKE_TRESHOLD: 31, // miss spelling in .myb file
+    STROKE_THRESHOLD: 31,
+    STROKE_DURATION_LOGARITHMIC: 32,
+    STROKE_HOLDTIME: 33,
+    CUSTOM_INPUT: 34,
+    CUSTOM_INPUT_SLOWNESS: 35,
+    ELLIPTICAL_DAB_RATIO: 36,
+    ELLIPTICAL_DAB_ANGLE: 37,
+    DIRECTION_FILTER: 38,
+    VERSION: 39,
+    ANTI_ALIASING: 40,
+    SETTINGS_COUNT: 41,
 
-  const STATE_X = 0;
-  const STATE_Y = 1;
-  const STATE_PRESSURE = 2;
-  const STATE_DIST = 3;
-  const STATE_ACTUAL_RADIUS = 4;
-  const STATE_SMUDGE_RA = 5;
-  const STATE_SMUDGE_GA = 6;
-  const STATE_SMUDGE_BA = 7;
-  const STATE_SMUDGE_A = 8;
-  const STATE_ACTUAL_X = 9;
-  const STATE_ACTUAL_Y = 10;
-  const STATE_NORM_DX_SLOW = 11;
-  const STATE_NORM_DY_SLOW = 12;
-  const STATE_NORM_SPEED1_SLOW = 13;
-  const STATE_NORM_SPEED2_SLOW = 14;
-  const STATE_STROKE = 15;
-  const STATE_STROKE_STARTED = 16;
-  const STATE_CUSTOM_INPUT = 17;
-  const STATE_RNG_SEED = 18;
-  const STATE_ACTUAL_ELLIPTICAL_DAB_RATIO = 19;
-  const STATE_ACTUAL_ELLIPTICAL_DAB_ANGLE = 20;
-  const STATE_DIRECTION_DX = 21;
-  const STATE_DIRECTION_DY = 22;
-  const STATE_DECLINATION = 23;
-  const STATE_ASCENSION = 24;
-  const STATE_COUNT = 25;
+    //obsolute
+    ADAPT_COLOR_FROM_IMAGE: 1000,
+    CHANGE_RADIUS: 1000,
+    GROUP: 1000,
+  };
+  const STATE = {
+    X: 0,
+    Y: 1,
+    PRESSURE: 2,
+    DIST: 3,
+    ACTUAL_RADIUS: 4,
+    SMUDGE_RA: 5,
+    SMUDGE_GA: 6,
+    SMUDGE_BA: 7,
+    SMUDGE_A: 8,
+    ACTUAL_X: 9,
+    ACTUAL_Y: 10,
+    NORM_DX_SLOW: 11,
+    NORM_DY_SLOW: 12,
+    NORM_SPEED1_SLOW: 13,
+    NORM_SPEED2_SLOW: 14,
+    STROKE: 15,
+    STROKE_STARTED: 16,
+    CUSTOM_INPUT: 17,
+    RNG_SEED: 18,
+    ACTUAL_ELLIPTICAL_DAB_RATIO: 19,
+    ACTUAL_ELLIPTICAL_DAB_ANGLE: 20,
+    DIRECTION_DX: 21,
+    DIRECTION_DY: 22,
+    DECLINATION: 23,
+    ASCENSION: 24,
+    COUNT: 25,
+  };
 
   const MAX_DTIME = 100; // 5
+  const SKIP_PROPERTIES = ["parent_brush_name"];
 
   function AssertException(message) {
     this.message = message;
@@ -430,13 +437,7 @@
       this.context = canvas.contextTop;
     }
 
-    this.context.fillStyle = "rgba(255,255,255,255)";
-    this.context.fillRect(
-      0,
-      0,
-      this.canvas.clientWidth,
-      this.canvas.clientHeight
-    );
+    this.clearCanvas();
 
     this.draw_dab = function (
       x,
@@ -515,14 +516,11 @@
     };
   }
 
-  MypaintSurface.prototype.clearCanvas = function () {
-    this.context.fillStyle = "rgba(255,255,255,255)";
-    this.context.fillRect(
-      0,
-      0,
-      this.canvas.clientWidth,
-      this.canvas.clientHeight
-    );
+  MypaintSurface.prototype.clearCanvas = function (
+    color = "rgba(255,255,255,255)"
+  ) {
+    this.context.fillStyle = color;
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
   };
 
   function Mapping(inputcount) {
@@ -604,32 +602,32 @@
   }
 
   function MypaintBrush(brushsetting, surface) {
-    this.states = new Array(STATE_COUNT);
-    this.settings = new Array(BRUSH_SETTINGS_COUNT);
-    this.settings_value = new Array(BRUSH_SETTINGS_COUNT);
+    this.states = new Array(STATE.COUNT);
+    this.settings = new Array(BRUSH.SETTINGS_COUNT);
+    this.settings_value = new Array(BRUSH.SETTINGS_COUNT);
     this.speed_mapping_gamma = new Array(2);
     this.speed_mapping_m = new Array(2);
     this.speed_mapping_q = new Array(2);
     this.stroke_current_idling_time = 0;
     this.stroke_total_painting_time = 0;
 
-    for (var i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
-      this.settings[i] = new Mapping(INPUT_COUNT);
+    for (var i = 0; i < BRUSH.SETTINGS_COUNT; i++) {
+      this.settings[i] = new Mapping(INPUT.COUNT);
     }
     this.print_inputs = false;
 
-    for (var i = 0; i < STATE_COUNT; i++) this.states[i] = 0;
+    for (var i = 0; i < STATE.COUNT; i++) this.states[i] = 0;
 
     this.new_stroke = function (x, y) {
-      for (var i = 0; i < STATE_COUNT; i++) {
+      for (var i = 0; i < STATE.COUNT; i++) {
         this.states[i] = 0;
         this.settings_value[i] = 0;
       }
 
-      this.states[STATE_X] = x;
-      this.states[STATE_Y] = y;
-      this.states[STATE_STROKE] = 0;
-      this.states[STATE_STROKE_STARTED] = 0;
+      this.states[STATE.X] = x;
+      this.states[STATE.Y] = y;
+      this.states[STATE.STROKE] = 0;
+      this.states[STATE.STROKE_STARTED] = 0;
 
       stroke_current_idling_time = 0;
       stroke_total_painting_time = 0;
@@ -640,19 +638,19 @@
     };
 
     this.set_base_value = function (id, value) {
-      assert(id >= 0 && id < BRUSH_SETTINGS_COUNT, "id < BRUSH_SETTINGS_COUNT");
+      assert(id >= 0 && id < BRUSH.SETTINGS_COUNT, "id < BRUSH.SETTINGS_COUNT");
       this.settings[id].base_value = value;
 
       this.settings_base_values_have_changed();
     };
 
     this.set_mapping_n = function (id, input, n) {
-      assert(id >= 0 && id < BRUSH_SETTINGS_COUNT, "id <BRUSH_SETTINGS_COUNT");
+      assert(id >= 0 && id < BRUSH.SETTINGS_COUNT, "id <BRUSH.SETTINGS_COUNT");
       this.settings[id].set_n(input, n);
     };
 
     this.set_mapping_point = function (id, input, index, x, y) {
-      assert(id >= 0 && id < BRUSH_SETTINGS_COUNT, "id<BRUSH_SETTINGS_COUNT");
+      assert(id >= 0 && id < BRUSH.SETTINGS_COUNT, "id<BRUSH.SETTINGS_COUNT");
       this.settings[id].set_point(input, index, x, y);
     };
 
@@ -668,8 +666,8 @@
     this.settings_base_values_have_changed = function () {
       for (var i = 0; i < 2; i++) {
         var gamma;
-        if (i == 0) gamma = this.settings[BRUSH_SPEED1_GAMMA].base_value;
-        else gamma = this.settings[BRUSH_SPEED2_GAMMA].base_value;
+        if (i == 0) gamma = this.settings[BRUSH.SPEED1_GAMMA].base_value;
+        else gamma = this.settings[BRUSH.SPEED2_GAMMA].base_value;
         gamma = Math.exp(gamma);
         var fix1_x = 45.0;
         var fix1_y = 0.5;
@@ -690,19 +688,30 @@
 
     this.readmyb_json = function (settings) {
       for (var setting in settings) {
-        try {
-          var idx = eval("BRUSH_" + setting.toUpperCase());
-        } catch (error) {
-          console.error(`Not found: ${setting.toUpperCase()}`);
+        if (SKIP_PROPERTIES.includes(setting)) {
+          console.warn(`Skip property: ${setting.toUpperCase()}`);
           continue;
         }
 
-        if (idx >= BRUSH_SETTINGS_COUNT) continue; //obsolute setting name , e.g ADAPT_COLOR_FROM_IMAGE
+        if (!BRUSH.hasOwnProperty(setting.toUpperCase())) {
+          console.warn(`Not found property: ${setting.toUpperCase()}`);
+          continue;
+        }
+
+        var idx = BRUSH[setting.toUpperCase()]; // eval("BRUSH_" + setting.toUpperCase());
+
+        if (idx >= BRUSH.SETTINGS_COUNT) continue; //obsolute setting name , e.g ADAPT_COLOR_FROM_IMAGE
+
         m = this.settings[idx];
         m.base_value = settings[setting].base_value;
         m.inputs_used = 0;
         for (var prop in settings[setting].pointsList) {
-          var propidx = eval("INPUT_" + prop.toUpperCase());
+          if (!INPUT.hasOwnProperty(prop.toUpperCase())) {
+            console.warn(`Not found state: ${prop.toUpperCase()}`);
+            continue;
+          }
+
+          var propidx = INPUT[prop.toUpperCase()]; // eval("INPUT." + prop.toUpperCase());
           m.pointsList[propidx].n =
             settings[setting].pointsList[prop].length / 2;
           for (var i = 0; i < m.pointsList[propidx].n; i++) {
@@ -728,7 +737,7 @@
     step_dtime
   ) {
     var pressure;
-    var inputs = new Array(INPUT_COUNT);
+    var inputs = new Array(INPUT.COUNT);
 
     if (step_dtime < 0.0) {
       //printf("Time is running backwards!\n");
@@ -738,39 +747,39 @@
       step_dtime = 0.001;
     }
 
-    this.states[STATE_X] += step_dx;
-    this.states[STATE_Y] += step_dy;
-    this.states[STATE_PRESSURE] += step_dpressure;
+    this.states[STATE.X] += step_dx;
+    this.states[STATE.Y] += step_dy;
+    this.states[STATE.PRESSURE] += step_dpressure;
 
-    this.states[STATE_DECLINATION] += step_declination;
-    this.states[STATE_ASCENSION] += step_ascension;
+    this.states[STATE.DECLINATION] += step_declination;
+    this.states[STATE.ASCENSION] += step_ascension;
 
     var base_radius = Math.exp(
-      this.settings[BRUSH_RADIUS_LOGARITHMIC].base_value
+      this.settings[BRUSH.RADIUS_LOGARITHMIC].base_value
     );
 
     // FIXME: does happen (interpolation problem?)
-    this.states[STATE_PRESSURE] = clamp(this.states[STATE_PRESSURE], 0.0, 1.0);
-    pressure = this.states[STATE_PRESSURE];
+    this.states[STATE.PRESSURE] = clamp(this.states[STATE.PRESSURE], 0.0, 1.0);
+    pressure = this.states[STATE.PRESSURE];
 
     {
       // start / end stroke (for "stroke" input only)
-      if (!this.states[STATE_STROKE_STARTED]) {
+      if (!this.states[STATE.STROKE_STARTED]) {
         if (
           pressure >
-          this.settings[BRUSH_STROKE_TRESHOLD].base_value + 0.0001
+          this.settings[BRUSH.STROKE_TRESHOLD].base_value + 0.0001
         ) {
           // start new stroke     //printf("stroke start %f\n", pressure);
-          this.states[STATE_STROKE_STARTED] = 1;
-          this.states[STATE_STROKE] = 0.0;
+          this.states[STATE.STROKE_STARTED] = 1;
+          this.states[STATE.STROKE] = 0.0;
         }
       } else {
         if (
           pressure <=
-          this.settings[BRUSH_STROKE_TRESHOLD].base_value * 0.9 + 0.0001
+          this.settings[BRUSH.STROKE_TRESHOLD].base_value * 0.9 + 0.0001
         ) {
           // end stroke      //printf("stroke end\n");
-          this.states[STATE_STROKE_STARTED] = 0;
+          this.states[STATE.STROKE_STARTED] = 0;
         }
       }
     }
@@ -783,42 +792,42 @@
     norm_speed = Math.sqrt(norm_dx * norm_dx + norm_dy * norm_dy);
     norm_dist = norm_speed * step_dtime;
 
-    inputs[INPUT_PRESSURE] = pressure;
-    inputs[INPUT_SPEED1] =
+    inputs[INPUT.PRESSURE] = pressure;
+    inputs[INPUT.SPEED1] =
       Math.log(
-        this.speed_mapping_gamma[0] + this.states[STATE_NORM_SPEED1_SLOW]
+        this.speed_mapping_gamma[0] + this.states[STATE.NORM_SPEED1_SLOW]
       ) *
         this.speed_mapping_m[0] +
       this.speed_mapping_q[0];
-    inputs[INPUT_SPEED2] =
+    inputs[INPUT.SPEED2] =
       Math.log(
-        this.speed_mapping_gamma[1] + this.states[STATE_NORM_SPEED2_SLOW]
+        this.speed_mapping_gamma[1] + this.states[STATE.NORM_SPEED2_SLOW]
       ) *
         this.speed_mapping_m[1] +
       this.speed_mapping_q[1];
-    inputs[INPUT_RANDOM] = Math.random(); //g_rand_double (rng);
-    inputs[INPUT_STROKE] = Math.min(this.states[STATE_STROKE], 1.0);
-    inputs[INPUT_DIRECTION] = fmodf(
+    inputs[INPUT.RANDOM] = Math.random(); //g_rand_double (rng);
+    inputs[INPUT.STROKE] = Math.min(this.states[STATE.STROKE], 1.0);
+    inputs[INPUT.DIRECTION] = fmodf(
       (Math.atan2(
-        this.states[STATE_DIRECTION_DY],
-        this.states[STATE_DIRECTION_DX]
+        this.states[STATE.DIRECTION_DY],
+        this.states[STATE.DIRECTION_DX]
       ) /
         (2 * Math.PI)) *
         360 +
         180.0,
       180.0
     );
-    inputs[INPUT_TILT_DECLINATION] = this.states[STATE_DECLINATION];
-    inputs[INPUT_TILT_ASCENSION] = this.states[STATE_ASCENSION];
-    inputs[INPUT_CUSTOM] = this.states[STATE_CUSTOM_INPUT];
+    inputs[INPUT.TILT_DECLINATION] = this.states[STATE.DECLINATION];
+    inputs[INPUT.TILT_ASCENSION] = this.states[STATE.ASCENSION];
+    inputs[INPUT.CUSTOM] = this.states[STATE.CUSTOM_INPUT];
     if (this.print_inputs) {
-      //g_print("press=% 4.3f, speed1=% 4.4f\tspeed2=% 4.4f\tstroke=% 4.3f\tcustom=% 4.3f\n", (double)inputs[INPUT_PRESSURE], (double)inputs[INPUT_SPEED1], (double)inputs[INPUT_SPEED2], (double)inputs[INPUT_STROKE], (double)inputs[INPUT_CUSTOM]);
+      //g_print("press=% 4.3f, speed1=% 4.4f\tspeed2=% 4.4f\tstroke=% 4.3f\tcustom=% 4.3f\n", (double)inputs[INPUT.PRESSURE], (double)inputs[INPUT.SPEED1], (double)inputs[INPUT.SPEED2], (double)inputs[INPUT.STROKE], (double)inputs[INPUT.CUSTOM]);
     }
     // FIXME: this one fails!!!
-    //assert(inputs[INPUT_SPEED1] >= 0.0 && inputs[INPUT_SPEED1] < 1e8); // checking for inf
+    //assert(inputs[INPUT.SPEED1] >= 0.0 && inputs[INPUT.SPEED1] < 1e8); // checking for inf
 
-    for (var i = 0; i < BRUSH_SETTINGS_COUNT; i++) {
-      if (i == BRUSH_ELLIPTICAL_DAB_RATIO) {
+    for (var i = 0; i < BRUSH.SETTINGS_COUNT; i++) {
+      if (i == BRUSH.ELLIPTICAL_DAB_RATIO) {
         var aa = 0;
       }
       this.settings_value[i] = this.settings[i].calculate(inputs);
@@ -827,11 +836,11 @@
     {
       var fac =
         1.0 -
-        this.exp_decay(this.settings_value[BRUSH_SLOW_TRACKING_PER_DAB], 1.0);
-      this.states[STATE_ACTUAL_X] +=
-        (this.states[STATE_X] - this.states[STATE_ACTUAL_X]) * fac; // FIXME: should this depend on base radius?
-      this.states[STATE_ACTUAL_Y] +=
-        (this.states[STATE_Y] - this.states[STATE_ACTUAL_Y]) * fac;
+        this.exp_decay(this.settings_value[BRUSH.SLOW_TRACKING_PER_DAB], 1.0);
+      this.states[STATE.ACTUAL_X] +=
+        (this.states[STATE.X] - this.states[STATE.ACTUAL_X]) * fac; // FIXME: should this depend on base radius?
+      this.states[STATE.ACTUAL_Y] +=
+        (this.states[STATE.Y] - this.states[STATE.ACTUAL_Y]) * fac;
     }
 
     {
@@ -839,14 +848,14 @@
       var fac;
       fac =
         1.0 -
-        this.exp_decay(this.settings_value[BRUSH_SPEED1_SLOWNESS], step_dtime);
-      this.states[STATE_NORM_SPEED1_SLOW] +=
-        (norm_speed - this.states[STATE_NORM_SPEED1_SLOW]) * fac;
+        this.exp_decay(this.settings_value[BRUSH.SPEED1_SLOWNESS], step_dtime);
+      this.states[STATE.NORM_SPEED1_SLOW] +=
+        (norm_speed - this.states[STATE.NORM_SPEED1_SLOW]) * fac;
       fac =
         1.0 -
-        this.exp_decay(this.settings_value[BRUSH_SPEED2_SLOWNESS], step_dtime);
-      this.states[STATE_NORM_SPEED2_SLOW] +=
-        (norm_speed - this.states[STATE_NORM_SPEED2_SLOW]) * fac;
+        this.exp_decay(this.settings_value[BRUSH.SPEED2_SLOWNESS], step_dtime);
+      this.states[STATE.NORM_SPEED2_SLOW] +=
+        (norm_speed - this.states[STATE.NORM_SPEED2_SLOW]) * fac;
     }
 
     {
@@ -857,17 +866,17 @@
       //   A replacement could be a directed random offset.
 
       var time_constant =
-        Math.exp(this.settings_value[BRUSH_OFFSET_BY_SPEED_SLOWNESS] * 0.01) -
+        Math.exp(this.settings_value[BRUSH.OFFSET_BY_SPEED_SLOWNESS] * 0.01) -
         1.0;
       // Workaround for a bug that happens mainly on Windows, causing
       // individual dabs to be placed far far away. Using the speed
       // with zero filtering is just asking for trouble anyway.
       if (time_constant < 0.002) time_constant = 0.002;
       var fac = 1.0 - this.exp_decay(time_constant, step_dtime);
-      this.states[STATE_NORM_DX_SLOW] +=
-        (norm_dx - this.states[STATE_NORM_DX_SLOW]) * fac;
-      this.states[STATE_NORM_DY_SLOW] +=
-        (norm_dy - this.states[STATE_NORM_DY_SLOW]) * fac;
+      this.states[STATE.NORM_DX_SLOW] +=
+        (norm_dx - this.states[STATE.NORM_DX_SLOW]) * fac;
+      this.states[STATE.NORM_DY_SLOW] +=
+        (norm_dy - this.states[STATE.NORM_DY_SLOW]) * fac;
     }
 
     {
@@ -878,12 +887,12 @@
       var fac =
         1.0 -
         this.exp_decay(
-          Math.exp(this.settings_value[BRUSH_DIRECTION_FILTER] * 0.5) - 1.0,
+          Math.exp(this.settings_value[BRUSH.DIRECTION_FILTER] * 0.5) - 1.0,
           step_in_dabtime
         );
 
-      var dx_old = this.states[STATE_DIRECTION_DX];
-      var dy_old = this.states[STATE_DIRECTION_DY];
+      var dx_old = this.states[STATE.DIRECTION_DX];
+      var dy_old = this.states[STATE.DIRECTION_DY];
       // use the opposite speed vector if it is closer (we don't care about 180 degree turns)
       if (
         Math.sqrt(dx_old - dx) + Math.sqrt(dy_old - dy) >
@@ -892,10 +901,10 @@
         dx = -dx;
         dy = -dy;
       }
-      this.states[STATE_DIRECTION_DX] +=
-        (dx - this.states[STATE_DIRECTION_DX]) * fac;
-      this.states[STATE_DIRECTION_DY] +=
-        (dy - this.states[STATE_DIRECTION_DY]) * fac;
+      this.states[STATE.DIRECTION_DX] +=
+        (dx - this.states[STATE.DIRECTION_DX]) * fac;
+      this.states[STATE.DIRECTION_DY] +=
+        (dy - this.states[STATE.DIRECTION_DY]) * fac;
     }
 
     {
@@ -903,10 +912,10 @@
       var fac;
       fac =
         1.0 -
-        this.exp_decay(this.settings_value[BRUSH_CUSTOM_INPUT_SLOWNESS], 0.1);
-      this.states[STATE_CUSTOM_INPUT] +=
-        (this.settings_value[BRUSH_CUSTOM_INPUT] -
-          this.states[STATE_CUSTOM_INPUT]) *
+        this.exp_decay(this.settings_value[BRUSH.CUSTOM_INPUT.SLOWNESS], 0.1);
+      this.states[STATE.CUSTOM_INPUT] +=
+        (this.settings_value[BRUSH.CUSTOM_INPUT] -
+          this.states[STATE.CUSTOM_INPUT]) *
         fac;
     }
 
@@ -915,38 +924,38 @@
       var frequency;
       var wrap;
       frequency = Math.exp(
-        -this.settings_value[BRUSH_STROKE_DURATION_LOGARITHMIC]
+        -this.settings_value[BRUSH.STROKE_DURATION_LOGARITHMIC]
       );
-      this.states[STATE_STROKE] += norm_dist * frequency;
+      this.states[STATE.STROKE] += norm_dist * frequency;
       // can happen, probably caused by rounding
-      if (this.states[STATE_STROKE] < 0) this.states[STATE_STROKE] = 0;
-      wrap = 1.0 + this.settings_value[BRUSH_STROKE_HOLDTIME];
-      if (this.states[STATE_STROKE] > wrap) {
+      if (this.states[STATE.STROKE] < 0) this.states[STATE.STROKE] = 0;
+      wrap = 1.0 + this.settings_value[BRUSH.STROKE_HOLDTIME];
+      if (this.states[STATE.STROKE] > wrap) {
         if (wrap > 9.9 + 1.0) {
           // "inifinity", just hold stroke somewhere >= 1.0
-          this.states[STATE_STROKE] = 1.0;
+          this.states[STATE.STROKE] = 1.0;
         } else {
-          this.states[STATE_STROKE] = fmodf(this.states[STATE_STROKE], wrap);
+          this.states[STATE.STROKE] = fmodf(this.states[STATE.STROKE], wrap);
           // just in case
-          if (this.states[STATE_STROKE] < 0) this.states[STATE_STROKE] = 0;
+          if (this.states[STATE.STROKE] < 0) this.states[STATE.STROKE] = 0;
         }
       }
     }
 
     // calculate final radius
     var radius_log;
-    radius_log = this.settings_value[BRUSH_RADIUS_LOGARITHMIC];
-    this.states[STATE_ACTUAL_RADIUS] = Math.exp(radius_log);
-    if (this.states[STATE_ACTUAL_RADIUS] < ACTUAL_RADIUS_MIN)
-      this.states[STATE_ACTUAL_RADIUS] = ACTUAL_RADIUS_MIN;
-    if (this.states[STATE_ACTUAL_RADIUS] > ACTUAL_RADIUS_MAX)
-      this.states[STATE_ACTUAL_RADIUS] = ACTUAL_RADIUS_MAX;
+    radius_log = this.settings_value[BRUSH.RADIUS_LOGARITHMIC];
+    this.states[STATE.ACTUAL_RADIUS] = Math.exp(radius_log);
+    if (this.states[STATE.ACTUAL_RADIUS] < ACTUAL_RADIUS_MIN)
+      this.states[STATE.ACTUAL_RADIUS] = ACTUAL_RADIUS_MIN;
+    if (this.states[STATE.ACTUAL_RADIUS] > ACTUAL_RADIUS_MAX)
+      this.states[STATE.ACTUAL_RADIUS] = ACTUAL_RADIUS_MAX;
 
     // aspect ratio (needs to be caluclated here because it can affect the dab spacing)
-    this.states[STATE_ACTUAL_ELLIPTICAL_DAB_RATIO] =
-      this.settings_value[BRUSH_ELLIPTICAL_DAB_RATIO];
-    this.states[STATE_ACTUAL_ELLIPTICAL_DAB_ANGLE] =
-      this.settings_value[BRUSH_ELLIPTICAL_DAB_ANGLE];
+    this.states[STATE.ACTUAL_ELLIPTICAL_DAB_RATIO] =
+      this.settings_value[BRUSH.ELLIPTICAL_DAB_RATIO];
+    this.states[STATE.ACTUAL_ELLIPTICAL_DAB_ANGLE] =
+      this.settings_value[BRUSH.ELLIPTICAL_DAB_ANGLE];
   };
 
   MypaintBrush.prototype.prepare_and_draw_dab = function (surface) {
@@ -954,21 +963,22 @@
     var radius;
 
     // ensure we don't get a positive result with two negative opaque values
-    if (this.settings_value[BRUSH_OPAQUE] < 0) settings_value[BRUSH_OPAQUE] = 0;
+    if (this.settings_value[BRUSH.OPAQUE] < 0)
+      this.settings_value[BRUSH.OPAQUE] = 0;
     opaque =
-      this.settings_value[BRUSH_OPAQUE] *
-      this.settings_value[BRUSH_OPAQUE_MULTIPLY];
+      this.settings_value[BRUSH.OPAQUE] *
+      this.settings_value[BRUSH.OPAQUE_MULTIPLY];
     opaque = clamp(opaque, 0.0, 1.0);
     //if (opaque == 0.0) return false; <-- cannot do that, since we need to update smudge state.
-    if (this.settings_value[BRUSH_OPAQUE_LINEARIZE]) {
+    if (this.settings_value[BRUSH.OPAQUE_LINEARIZE]) {
       // OPTIMIZE: no need to recalculate this for each dab
       var alpha, beta, alpha_dab, beta_dab;
       var dabs_per_pixel;
       // dabs_per_pixel is just estimated roughly, I didn't think hard
       // about the case when the radius changes during the stroke
       dabs_per_pixel =
-        (this.settings[BRUSH_DABS_PER_ACTUAL_RADIUS].base_value +
-          this.settings[BRUSH_DABS_PER_BASIC_RADIUS].base_value) *
+        (this.settings[BRUSH.DABS_PER_ACTUAL_RADIUS].base_value +
+          this.settings[BRUSH.DABS_PER_BASIC_RADIUS].base_value) *
         2.0;
 
       // the correction is probably not wanted if the dabs don't overlap
@@ -977,7 +987,7 @@
       // interpret the user-setting smoothly
       dabs_per_pixel =
         1.0 +
-        this.settings[BRUSH_OPAQUE_LINEARIZE].base_value *
+        this.settings[BRUSH.OPAQUE_LINEARIZE].base_value *
           (dabs_per_pixel - 1.0);
 
       // see doc/brushdab_saturation.png
@@ -990,42 +1000,42 @@
       opaque = alpha_dab;
     }
 
-    x = this.states[STATE_ACTUAL_X];
-    y = this.states[STATE_ACTUAL_Y];
+    x = this.states[STATE.ACTUAL_X];
+    y = this.states[STATE.ACTUAL_Y];
 
     var base_radius = Math.exp(
-      this.settings[BRUSH_RADIUS_LOGARITHMIC].base_value
+      this.settings[BRUSH.RADIUS_LOGARITHMIC].base_value
     );
 
-    if (this.settings_value[BRUSH_OFFSET_BY_SPEED]) {
+    if (this.settings_value[BRUSH.OFFSET_BY_SPEED]) {
       x +=
-        this.states[STATE_NORM_DX_SLOW] *
-        this.settings_value[BRUSH_OFFSET_BY_SPEED] *
+        this.states[STATE.NORM_DX_SLOW] *
+        this.settings_value[BRUSH.OFFSET_BY_SPEED] *
         0.1 *
         base_radius;
       y +=
-        this.states[STATE_NORM_DY_SLOW] *
-        this.settings_value[BRUSH_OFFSET_BY_SPEED] *
+        this.states[STATE.NORM_DY_SLOW] *
+        this.settings_value[BRUSH.OFFSET_BY_SPEED] *
         0.1 *
         base_radius;
     }
 
-    if (this.settings_value[BRUSH_OFFSET_BY_RANDOM]) {
-      var amp = this.settings_value[BRUSH_OFFSET_BY_RANDOM];
+    if (this.settings_value[BRUSH.OFFSET_BY_RANDOM]) {
+      var amp = this.settings_value[BRUSH.OFFSET_BY_RANDOM];
       if (amp < 0.0) amp = 0.0;
       x += rand_gauss() * amp * base_radius;
       y += rand_gauss() * amp * base_radius;
     }
 
-    radius = this.states[STATE_ACTUAL_RADIUS];
-    if (this.settings_value[BRUSH_RADIUS_BY_RANDOM]) {
+    radius = this.states[STATE.ACTUAL_RADIUS];
+    if (this.settings_value[BRUSH.RADIUS_BY_RANDOM]) {
       var radius_log, alpha_correction;
       // go back to logarithmic radius to add the noise
-      radius_log = this.settings_value[BRUSH_RADIUS_LOGARITHMIC];
-      radius_log += rand_gauss() * this.settings_value[BRUSH_RADIUS_BY_RANDOM];
+      radius_log = this.settings_value[BRUSH.RADIUS_LOGARITHMIC];
+      radius_log += rand_gauss() * this.settings_value[BRUSH.RADIUS_BY_RANDOM];
       radius = Math.exp(radius_log);
       radius = clamp(radius, ACTUAL_RADIUS_MIN, ACTUAL_RADIUS_MAX);
-      alpha_correction = this.states[STATE_ACTUAL_RADIUS] / radius;
+      alpha_correction = this.states[STATE.ACTUAL_RADIUS] / radius;
       alpha_correction = Math.sqrt(alpha_correction);
       if (alpha_correction <= 1.0) {
         opaque *= alpha_correction;
@@ -1034,41 +1044,41 @@
 
     // color part
     var colorhsv = new ColorHSV(
-      this.settings[BRUSH_COLOR_HUE].base_value,
-      this.settings[BRUSH_COLOR_SATURATION].base_value,
-      this.settings[BRUSH_COLOR_VALUE].base_value
+      this.settings[BRUSH.COLOR_HUE].base_value,
+      this.settings[BRUSH.COLOR_SATURATION].base_value,
+      this.settings[BRUSH.COLOR_VALUE].base_value
     );
     var color_h, color_s, color_v;
-    //var color_h = this.settings[BRUSH_COLOR_HUE].base_value;
-    //var color_s = this.settings[BRUSH_COLOR_SATURATION].base_value;
-    //var color_v = this.settings[BRUSH_COLOR_VALUE].base_value;
+    //var color_h = this.settings[BRUSH.COLOR_HUE].base_value;
+    //var color_s = this.settings[BRUSH.COLOR_SATURATION].base_value;
+    //var color_v = this.settings[BRUSH.COLOR_VALUE].base_value;
     color_h = colorhsv.h;
     color_s = colorhsv.s;
     color_v = colorhsv.v;
     var eraser_target_alpha = 1.0;
-    if (this.settings_value[BRUSH_SMUDGE] > 0.0) {
+    if (this.settings_value[BRUSH.SMUDGE] > 0.0) {
       // mix (in RGB) the smudge color with the brush color
       colorhsv.hsv_to_rgb_float();
       color_h = colorhsv.r;
       color_s = colorhsv.g;
       color_v = colorhsv.b; //after conversion, color_h,s,v is rgb
-      var fac = this.settings_value[BRUSH_SMUDGE];
+      var fac = this.settings_value[BRUSH.SMUDGE];
       if (fac > 1.0) fac = 1.0;
       // If the smudge color somewhat transparent, then the resulting
       // dab will do erasing towards that transparency level.
       // see also ../doc/smudge_math.png
-      eraser_target_alpha = (1 - fac) * 1.0 + fac * this.states[STATE_SMUDGE_A];
+      eraser_target_alpha = (1 - fac) * 1.0 + fac * this.states[STATE.SMUDGE_A];
       // fix rounding errors (they really seem to happen in the previous line)
       eraser_target_alpha = clamp(eraser_target_alpha, 0.0, 1.0);
       if (eraser_target_alpha > 0) {
         color_h =
-          (fac * this.states[STATE_SMUDGE_RA] + (1 - fac) * color_h) /
+          (fac * this.states[STATE.SMUDGE_RA] + (1 - fac) * color_h) /
           eraser_target_alpha;
         color_s =
-          (fac * this.states[STATE_SMUDGE_GA] + (1 - fac) * color_s) /
+          (fac * this.states[STATE.SMUDGE_GA] + (1 - fac) * color_s) /
           eraser_target_alpha;
         color_v =
-          (fac * this.states[STATE_SMUDGE_BA] + (1 - fac) * color_v) /
+          (fac * this.states[STATE.SMUDGE_BA] + (1 - fac) * color_v) /
           eraser_target_alpha;
       } else {
         // we are only erasing; the color does not matter
@@ -1084,20 +1094,20 @@
     }
 
     if (
-      this.settings_value[BRUSH_SMUDGE_LENGTH] < 1.0 &&
+      this.settings_value[BRUSH.SMUDGE_LENGTH] < 1.0 &&
       // optimization, since normal brushes have smudge_length == 0.5 without actually smudging
-      (this.settings_value[BRUSH_SMUDGE] != 0.0 ||
-        !this.settings[BRUSH_SMUDGE].is_constant())
+      (this.settings_value[BRUSH.SMUDGE] != 0.0 ||
+        !this.settings[BRUSH.SMUDGE].is_constant())
     ) {
       var smudge_radius =
-        radius * Math.exp(this.settings_value[BRUSH_SMUDGE_RADIUS_LOG]);
+        radius * Math.exp(this.settings_value[BRUSH.SMUDGE_RADIUS_LOG]);
       smudge_radius = clamp(
         smudge_radius,
         ACTUAL_RADIUS_MIN,
         ACTUAL_RADIUS_MAX
       );
 
-      var fac = this.settings_value[BRUSH_SMUDGE_LENGTH];
+      var fac = this.settings_value[BRUSH.SMUDGE_LENGTH];
       if (fac < 0.0) fac = 0;
       var px, py;
       px = Math.round(x);
@@ -1111,37 +1121,37 @@
       a = surface.a;
 
       // updated the smudge color (stored with premultiplied alpha)
-      this.states[STATE_SMUDGE_A] =
-        fac * this.states[STATE_SMUDGE_A] + (1 - fac) * a;
+      this.states[STATE.SMUDGE_A] =
+        fac * this.states[STATE.SMUDGE_A] + (1 - fac) * a;
       // fix rounding errors
-      this.states[STATE_SMUDGE_A] = clamp(
-        this.states[STATE_SMUDGE_A],
+      this.states[STATE.SMUDGE_A] = clamp(
+        this.states[STATE.SMUDGE_A],
         0.0,
         1.0
       );
 
-      this.states[STATE_SMUDGE_RA] =
-        fac * this.states[STATE_SMUDGE_RA] + (1 - fac) * r * a;
-      this.states[STATE_SMUDGE_GA] =
-        fac * this.states[STATE_SMUDGE_GA] + (1 - fac) * g * a;
-      this.states[STATE_SMUDGE_BA] =
-        fac * this.states[STATE_SMUDGE_BA] + (1 - fac) * b * a;
+      this.states[STATE.SMUDGE_RA] =
+        fac * this.states[STATE.SMUDGE_RA] + (1 - fac) * r * a;
+      this.states[STATE.SMUDGE_GA] =
+        fac * this.states[STATE.SMUDGE_GA] + (1 - fac) * g * a;
+      this.states[STATE.SMUDGE_BA] =
+        fac * this.states[STATE.SMUDGE_BA] + (1 - fac) * b * a;
     }
 
     // eraser
-    if (this.settings_value[BRUSH_ERASER]) {
-      eraser_target_alpha *= 1.0 - this.settings_value[BRUSH_ERASER];
+    if (this.settings_value[BRUSH.ERASER]) {
+      eraser_target_alpha *= 1.0 - this.settings_value[BRUSH.ERASER];
     }
 
     // HSV color change
-    color_h += this.settings_value[BRUSH_CHANGE_COLOR_H];
-    color_s += this.settings_value[BRUSH_CHANGE_COLOR_HSV_S];
-    color_v += this.settings_value[BRUSH_CHANGE_COLOR_V];
+    color_h += this.settings_value[BRUSH.CHANGE_COLOR_H];
+    color_s += this.settings_value[BRUSH.CHANGE_COLOR_HSV_S];
+    color_v += this.settings_value[BRUSH.CHANGE_COLOR_V];
 
     // HSL color change
     if (
-      this.settings_value[BRUSH_CHANGE_COLOR_L] ||
-      this.settings_value[BRUSH_CHANGE_COLOR_HSL_S]
+      this.settings_value[BRUSH.CHANGE_COLOR_L] ||
+      this.settings_value[BRUSH.CHANGE_COLOR_HSL_S]
     ) {
       // (calculating way too much here, can be optimized if neccessary)
       // this function will CLAMP the inputs
@@ -1150,8 +1160,8 @@
       colorhsv.hsv_to_rgb_float();
       colorrgb = new ColorRGB(colorhsv.r, colorhsv.g, colorhsv.b);
       colorrgb.rgb_to_hsl_float();
-      colorrgb.l += this.settings_value[BRUSH_CHANGE_COLOR_L];
-      colorrgb.s += this.settings_value[BRUSH_CHANGE_COLOR_HSL_S];
+      colorrgb.l += this.settings_value[BRUSH.CHANGE_COLOR_L];
+      colorrgb.s += this.settings_value[BRUSH.CHANGE_COLOR_HSL_S];
       colorhsl = new ColorHSL(colorrgb.h, colorrgb.s, colorrgb.l);
       colorhsl.hsl_to_rgb_float();
       colorrgb = new ColorRGB(colorhsl.r, colorhsl.g, colorhsl.b);
@@ -1160,16 +1170,16 @@
       color_s = colorrgb.s;
       color_v = colorrgb.v;
       /*
-      hsv_to_rgb_float (&color_h, &color_s, &color_v);
-      rgb_to_hsl_float (&color_h, &color_s, &color_v);
-      color_v += settings_value[BRUSH_CHANGE_COLOR_L];
-      color_s += settings_value[BRUSH_CHANGE_COLOR_HSL_S];
-      hsl_to_rgb_float (&color_h, &color_s, &color_v);
-      rgb_to_hsv_float (&color_h, &color_s, &color_v);
-      */
+        hsv_to_rgb_float (&color_h, &color_s, &color_v);
+        rgb_to_hsl_float (&color_h, &color_s, &color_v);
+        color_v += settings_value[BRUSH.CHANGE_COLOR_L];
+        color_s += settings_value[BRUSH.CHANGE_COLOR_HSL_S];
+        hsl_to_rgb_float (&color_h, &color_s, &color_v);
+        rgb_to_hsv_float (&color_h, &color_s, &color_v);
+        */
     }
 
-    var hardness = this.settings_value[BRUSH_HARDNESS];
+    var hardness = this.settings_value[BRUSH.HARDNESS];
 
     // the functions below will CLAMP most inputs
     colorhsv = new ColorHSV(color_h, color_s, color_v);
@@ -1177,7 +1187,7 @@
 
     // Ant-alising
     const current_fadeout_in_pixels = radius * (1.0 - hardness);
-    const min_fadeout_in_pixels = this.settings_value[BRUSH_ANTI_ALIASING];
+    const min_fadeout_in_pixels = this.settings_value[BRUSH.ANTI_ALIASING];
     if (current_fadeout_in_pixels < min_fadeout_in_pixels) {
       const current_optical_radius = radius - ((1.0 - hardness) * radius) / 2.0;
       const hardness_new =
@@ -1200,8 +1210,8 @@
       opaque,
       hardness,
       eraser_target_alpha,
-      this.states[STATE_ACTUAL_ELLIPTICAL_DAB_RATIO],
-      this.states[STATE_ACTUAL_ELLIPTICAL_DAB_ANGLE]
+      this.states[STATE.ACTUAL_ELLIPTICAL_DAB_RATIO],
+      this.states[STATE.ACTUAL_ELLIPTICAL_DAB_ANGLE]
     );
   };
 
@@ -1211,37 +1221,37 @@
     var res1, res2, res3;
     var dist;
 
-    if (this.states[STATE_ACTUAL_RADIUS] == 0.0)
-      this.states[STATE_ACTUAL_RADIUS] = Math.exp(
-        this.settings[BRUSH_RADIUS_LOGARITHMIC].base_value
+    if (this.states[STATE.ACTUAL_RADIUS] == 0.0)
+      this.states[STATE.ACTUAL_RADIUS] = Math.exp(
+        this.settings[BRUSH.RADIUS_LOGARITHMIC].base_value
       );
-    if (this.states[STATE_ACTUAL_RADIUS] < ACTUAL_RADIUS_MIN)
-      this.states[STATE_ACTUAL_RADIUS] = ACTUAL_RADIUS_MIN;
-    if (this.states[STATE_ACTUAL_RADIUS] > ACTUAL_RADIUS_MAX)
-      this.states[STATE_ACTUAL_RADIUS] = ACTUAL_RADIUS_MAX;
+    if (this.states[STATE.ACTUAL_RADIUS] < ACTUAL_RADIUS_MIN)
+      this.states[STATE.ACTUAL_RADIUS] = ACTUAL_RADIUS_MIN;
+    if (this.states[STATE.ACTUAL_RADIUS] > ACTUAL_RADIUS_MAX)
+      this.states[STATE.ACTUAL_RADIUS] = ACTUAL_RADIUS_MAX;
 
     // OPTIMIZE: expf() called too often
     var base_radius = Math.exp(
-      this.settings[BRUSH_RADIUS_LOGARITHMIC].base_value
+      this.settings[BRUSH.RADIUS_LOGARITHMIC].base_value
     );
     if (base_radius < ACTUAL_RADIUS_MIN) base_radius = ACTUAL_RADIUS_MIN;
     if (base_radius > ACTUAL_RADIUS_MAX) base_radius = ACTUAL_RADIUS_MAX;
     //if (base_radius < 0.5) base_radius = 0.5;
     //if (base_radius > 500.0) base_radius = 500.0;
 
-    xx = x - this.states[STATE_X];
-    yy = y - this.states[STATE_Y];
+    xx = x - this.states[STATE.X];
+    yy = y - this.states[STATE.Y];
     //dp = pressure - pressure; // Not useful?
     // TODO: control rate with pressure (dabs per pressure) (dpressure is useless)
 
-    if (this.states[STATE_ACTUAL_ELLIPTICAL_DAB_RATIO] > 1.0) {
+    if (this.states[STATE.ACTUAL_ELLIPTICAL_DAB_RATIO] > 1.0) {
       // code duplication, see tiledsurface::draw_dab()
       var angle_rad =
-        (this.states[STATE_ACTUAL_ELLIPTICAL_DAB_ANGLE] / 360) * 2 * Math.PI;
+        (this.states[STATE.ACTUAL_ELLIPTICAL_DAB_ANGLE] / 360) * 2 * Math.PI;
       var cs = Math.cos(angle_rad);
       var sn = Math.sin(angle_rad);
       var yyr =
-        (yy * cs - xx * sn) * this.states[STATE_ACTUAL_ELLIPTICAL_DAB_RATIO];
+        (yy * cs - xx * sn) * this.states[STATE.ACTUAL_ELLIPTICAL_DAB_RATIO];
       var xxr = yy * sn + xx * cs;
       dist = Math.sqrt(yyr * yyr + xxr * xxr);
     } else {
@@ -1251,12 +1261,12 @@
     // FIXME: no need for base_value or for the range checks above IF always the interpolation
     //        function will be called before this one
     res1 =
-      (dist / this.states[STATE_ACTUAL_RADIUS]) *
-      this.settings[BRUSH_DABS_PER_ACTUAL_RADIUS].base_value;
+      (dist / this.states[STATE.ACTUAL_RADIUS]) *
+      this.settings[BRUSH.DABS_PER_ACTUAL_RADIUS].base_value;
     res2 =
       (dist / base_radius) *
-      this.settings[BRUSH_DABS_PER_BASIC_RADIUS].base_value;
-    res3 = dt * this.settings[BRUSH_DABS_PER_SECOND].base_value;
+      this.settings[BRUSH.DABS_PER_BASIC_RADIUS].base_value;
+    res3 = dt * this.settings[BRUSH.DABS_PER_SECOND].base_value;
     return res1 + res2 + res3;
   };
 
@@ -1300,101 +1310,101 @@
 
     pressure = clamp(pressure, 0.0, 1.0);
     /*
-    if (!isfinite(x) || !isfinite(y) ||
-        (x > 1e10 || y > 1e10 || x < -1e10 || y < -1e10)) {
-      // workaround attempt for https://gna.org/bugs/?14372
-      g_print("Warning: ignoring brush::stroke_to with insane inputs (x = %f, y = %f)\n", (double)x, (double)y);
-      x = 0.0;
-      y = 0.0;
-      pressure = 0.0;
-    }
-    */
+      if (!isfinite(x) || !isfinite(y) ||
+          (x > 1e10 || y > 1e10 || x < -1e10 || y < -1e10)) {
+        // workaround attempt for https://gna.org/bugs/?14372
+        g_print("Warning: ignoring brush::stroke_to with insane inputs (x = %f, y = %f)\n", (double)x, (double)y);
+        x = 0.0;
+        y = 0.0;
+        pressure = 0.0;
+      }
+      */
     // the assertion below is better than out-of-memory later at save time
     //assert(x < 1e8 && y < 1e8 && x > -1e8 && y > -1e8);
 
     //if (dtime < 0) g_print("Time jumped backwards by dtime=%f seconds!\n", dtime);
     if (dtime <= 0) dtime = 0.0001; // protect against possible division by zero bugs
 
-    if (dtime > 0.1 && pressure && this.states[STATE_PRESSURE] == 0) {
+    if (dtime > 0.1 && pressure && this.states[STATE.PRESSURE] == 0) {
       // Workaround for tablets that don't report motion events without pressure.
       // This is to avoid linear interpolation of the pressure between two events.
       this.stroke_to(surface, x, y, 0.0, 90.0, 0.0, dtime - 0.0001);
       dtime = 0.0001;
     }
 
-    ///g_rand_set_seed (rng, states[STATE_RNG_SEED]);
+    ///g_rand_set_seed (rng, states[STATE.RNG_SEED]);
 
     {
       // calculate the actual "virtual" cursor position
 
       // noise first
-      if (this.settings[BRUSH_TRACKING_NOISE].base_value) {
+      if (this.settings[BRUSH.TRACKING_NOISE].base_value) {
         // OPTIMIZE: expf() called too often
         var base_radius = Math.exp(
-          this.settings[BRUSH_RADIUS_LOGARITHMIC].base_value
+          this.settings[BRUSH.RADIUS_LOGARITHMIC].base_value
         );
 
         x +=
           rand_gauss() *
-          this.settings[BRUSH_TRACKING_NOISE].base_value *
+          this.settings[BRUSH.TRACKING_NOISE].base_value *
           base_radius;
         y +=
           rand_gauss() *
-          this.settings[BRUSH_TRACKING_NOISE].base_value *
+          this.settings[BRUSH.TRACKING_NOISE].base_value *
           base_radius;
       }
 
       var fac =
         1.0 -
         this.exp_decay(
-          this.settings[BRUSH_SLOW_TRACKING].base_value,
+          this.settings[BRUSH.SLOW_TRACKING].base_value,
           100.0 * dtime
         );
-      x = this.states[STATE_X] + (x - this.states[STATE_X]) * fac;
-      y = this.states[STATE_Y] + (y - this.states[STATE_Y]) * fac;
+      x = this.states[STATE.X] + (x - this.states[STATE.X]) * fac;
+      y = this.states[STATE.Y] + (y - this.states[STATE.Y]) * fac;
     }
 
     // draw many (or zero) dabs to the next position
 
     // see doc/stroke2dabs.png
-    var dist_moved = this.states[STATE_DIST];
+    var dist_moved = this.states[STATE.DIST];
     var dist_todo = this.count_dabs_to(x, y, pressure, dtime);
 
     //if (dtime > 5 || dist_todo > 300) {
 
     if (dtime > MAX_DTIME) {
       /*
-        TODO:
-        if (dist_todo > 300) {
-        // this happens quite often, eg when moving the cursor back into the window
-        // FIXME: bad to hardcode a distance treshold here - might look at zoomed image
-        //        better detect leaving/entering the window and reset then.
-        g_print ("Warning: NOT drawing %f dabs.\n", dist_todo);
-        g_print ("dtime=%f, dx=%f\n", dtime, x-states[STATE_X]);
-        //must_reset = 1;
-        }
-      */
+          TODO:
+          if (dist_todo > 300) {
+          // this happens quite often, eg when moving the cursor back into the window
+          // FIXME: bad to hardcode a distance treshold here - might look at zoomed image
+          //        better detect leaving/entering the window and reset then.
+          g_print ("Warning: NOT drawing %f dabs.\n", dist_todo);
+          g_print ("dtime=%f, dx=%f\n", dtime, x-states[STATE.X]);
+          //must_reset = 1;
+          }
+        */
 
       //printf("Brush reset.\n");
-      for (var i = 0; i < STATE_COUNT; i++) {
+      for (var i = 0; i < STATE.COUNT; i++) {
         this.states[i] = 0;
       }
 
-      this.states[STATE_X] = x;
-      this.states[STATE_Y] = y;
-      this.states[STATE_PRESSURE] = pressure;
+      this.states[STATE.X] = x;
+      this.states[STATE.Y] = y;
+      this.states[STATE.PRESSURE] = pressure;
 
       // not resetting, because they will get overwritten below:
       //dx, dy, dpress, dtime
 
-      this.states[STATE_ACTUAL_X] = this.states[STATE_X];
-      this.states[STATE_ACTUAL_Y] = this.states[STATE_Y];
-      this.states[STATE_STROKE] = 1.0; // start in a state as if the stroke was long finished
+      this.states[STATE.ACTUAL_X] = this.states[STATE.X];
+      this.states[STATE.ACTUAL_Y] = this.states[STATE.Y];
+      this.states[STATE.STROKE] = 1.0; // start in a state as if the stroke was long finished
 
       return true;
     }
 
-    //g_print("dist = %f\n", states[STATE_DIST]);
+    //g_print("dist = %f\n", states[STATE.DIST]);
     //enum { UNKNOWN, YES, NO } painted = UNKNOWN;
     const UNKNOWN = 0;
     const YES = 1;
@@ -1417,13 +1427,13 @@
           // "move" the brush from one dab to the next
           frac = 1.0 / dist_todo;
         }
-        step_dx = frac * (x - this.states[STATE_X]);
-        step_dy = frac * (y - this.states[STATE_Y]);
-        step_dpressure = frac * (pressure - this.states[STATE_PRESSURE]);
+        step_dx = frac * (x - this.states[STATE.X]);
+        step_dy = frac * (y - this.states[STATE.Y]);
+        step_dpressure = frac * (pressure - this.states[STATE.PRESSURE]);
         step_dtime = frac * (dtime_left - 0.0);
         step_declination =
-          frac * (tilt_declination - this.states[STATE_DECLINATION]);
-        step_ascension = frac * (tilt_ascension - this.states[STATE_ASCENSION]);
+          frac * (tilt_declination - this.states[STATE.DECLINATION]);
+        step_ascension = frac * (tilt_ascension - this.states[STATE.ASCENSION]);
         // Though it looks different, time is interpolated exactly like x/y/pressure.
       }
 
@@ -1453,11 +1463,11 @@
       // depend on something that changes much faster than only every
       // dab (eg speed).
 
-      step_dx = x - this.states[STATE_X];
-      step_dy = y - this.states[STATE_Y];
-      step_dpressure = pressure - this.states[STATE_PRESSURE];
-      step_declination = tilt_declination - this.states[STATE_DECLINATION];
-      step_ascension = tilt_ascension - this.states[STATE_ASCENSION];
+      step_dx = x - this.states[STATE.X];
+      step_dy = y - this.states[STATE.Y];
+      step_dpressure = pressure - this.states[STATE.PRESSURE];
+      step_declination = tilt_declination - this.states[STATE.DECLINATION];
+      step_ascension = tilt_ascension - this.states[STATE.ASCENSION];
       step_dtime = dtime_left;
 
       //dtime_left = 0; but that value is not used any more
@@ -1473,11 +1483,11 @@
     }
 
     // save the fraction of a dab that is already done now
-    this.states[STATE_DIST] = dist_moved + dist_todo;
-    //g_print("dist_final = %f\n", states[STATE_DIST]);
+    this.states[STATE.DIST] = dist_moved + dist_todo;
+    //g_print("dist_final = %f\n", states[STATE.DIST]);
 
     // next seed for the RNG (GRand has no get_state() and states[] must always contain our full state)
-    //states[STATE_RNG_SEED] = g_rand_int(rng);
+    //states[STATE.RNG_SEED] = g_rand_int(rng);
 
     // stroke separation logic (for undo/redo)
 
