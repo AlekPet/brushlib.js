@@ -14,16 +14,23 @@ const fs = require("fs");
 const path = require("path");
 
 function convertBrushMain() {
-  const srcDirMyb = process.argv[3] ? process.argv[3] : "08";
-  const saveDir = process.argv[4] ? process.argv[saveDir] : `${srcDirMyb}_save`;
+  const sourceDir = process.argv[3];
+  const distDir = process.argv[4];
 
-  const pathBrushes = path.join(__dirname, srcDirMyb);
-  const saveBrushes = path.join(__dirname, saveDir);
+  const formatNewOld =
+    process.argv[5] && process.argv[5] === "new" ? "new" : "old";
+
+  const srcDirMyb = sourceDir ? sourceDir.trim() : "08";
+  const pathBrushes = path.join(__dirname, "packs_brushes", srcDirMyb);
 
   if (!fs.existsSync(pathBrushes)) {
     console.error(new Error(`File path not exists "${pathBrushes}"`));
     process.exit(1);
   }
+
+  const saveBrushes = distDir
+    ? path.join(__dirname, distDir.trim())
+    : path.join(__dirname, "brushes", srcDirMyb);
 
   const filterPropsMissing = ["#"];
   const useJsonFile = true;
@@ -97,7 +104,11 @@ function convertBrushMain() {
 
         if (ext === "myb") {
           filename = correctionFilename(filename);
-          promises.push(readFileAsync(pathFile, { filename }));
+          if (formatNewOld === "old") {
+            promises.push(readFileAsync(pathFile, { filename }));
+          } else {
+            promises.push(convertMybToJs(pen, { filename }));
+          }
         }
 
         if (ext === "png") {
@@ -111,7 +122,6 @@ function convertBrushMain() {
       });
 
       let countComplete = 0;
-      let optionValues = "";
       Promise.all(promises).then((results) => {
         results.forEach((response) => {
           if (!Object.keys(response).length) return true;
@@ -124,6 +134,7 @@ function convertBrushMain() {
           const dataToText = !useJsonFile
             ? `var ${filename} = ${JSON.stringify(data)}`
             : JSON.stringify(data);
+
           const fileSave = fs.createWriteStream(
             path.join(
               saveBrushes,
@@ -131,28 +142,19 @@ function convertBrushMain() {
             )
           );
 
-          optionValues += `<option value="${filename}" data-path="08_save/">${
-            filename[0].toUpperCase() + filename.slice(1)
-          }</option>\n`;
-
           fileSave.write(dataToText);
           countComplete += 1;
         });
 
         console.log(`Files converted ${countComplete} of ${promises.length}!`);
-        const fileSaveOptions = fs.createWriteStream(
-          path.join(__dirname, `select_options.txt`)
-        );
-        fileSaveOptions.write(optionValues, (err) => {
-          if (err) console.log(err);
-          console.log(`File 'select_options.txt' created!`);
-        });
+
+        runMakeJSONAfterConvert();
       });
     }
   );
 
   // New version myb (json)
-  function convertMybToJs(pen) {
+  function convertMybToJs(pen, options) {
     let mybjs = {};
     for (let prop in pen.settings) {
       let { base_value, inputs: pointsList } = pen.settings[prop];
@@ -171,7 +173,7 @@ function convertBrushMain() {
       }
     }
 
-    return mybjs;
+    return { data: mybjs, options };
   }
 
   // Old version myb
@@ -271,6 +273,21 @@ Brushes files get: ${Object.keys(listBrushed).reduce(
       0
     )}, foldres ${Object.keys(listBrushed).length}`
   );
+}
+
+function runMakeJSONAfterConvert() {
+  const readline = require("readline");
+  const readLine = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  readLine.question("Make json file avaiables brushes?: ", (textInput) => {
+    const answer = textInput.trim().toLowerCase();
+    if (["y", "yes", "1", "ok"].includes(answer)) {
+      getAvailableBrushes();
+    }
+    readLine.close();
+  });
 }
 
 function init() {
