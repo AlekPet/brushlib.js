@@ -448,7 +448,7 @@
     angle
   ) {}
 
-class MypaintSurface {
+  class MypaintSurface {
     _hardness = 0.5;
     _opaque = 1.0;
 

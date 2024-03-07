@@ -189,7 +189,7 @@ class Manager {
     this.cls = document.getElementById("cls_canvas");
     this.cls.addEventListener("click", this.clearCanvas.bind(this));
 
-    this.updateui(this.currentBrushSetting);
+    this.updateui();
   }
 
   clearCanvas() {
@@ -279,7 +279,9 @@ class Manager {
 
     this.colorbox.innerHTML = this.brushName;
 
-    this.sizeBrush.value = options.radius_logarithmic.base_value;
+
+    this.sizeBrush.value =
+      this.currentBrushSetting.radius_logarithmic.base_value;
     this.sizeBrush.nextElementSibling.textContent = this.sizeBrush.value;
 
     this.colorchanged();
@@ -304,16 +306,16 @@ class Manager {
     const [r, g, b] = hex2rgb(colorBrush.value);
     const [h, s, v] = rgbToHsv(r, g, b);
 
-    this.updateui({
-      color_h: { base_value: h },
-      color_s: { base_value: s },
-      color_v: { base_value: v },
-    });
+    this.currentBrushSetting.color_h.base_value = h;
+    this.currentBrushSetting.color_s.base_value = s;
+    this.currentBrushSetting.color_v.base_value = v;
 
     colorBrush.nextElementSibling.textContent = `${r} ${g} ${b}`;
     colorBrush.nextElementSibling.nextElementSibling.textContent = `${h.toFixed(
       1
     )} ${s.toFixed(1)} ${v.toFixed(1)}`;
+    
+    this.updateui();
   }
 
   colorchanged() {
