@@ -61,6 +61,7 @@
 
   const ACTUAL_RADIUS_MIN = 0.2;
   const ACTUAL_RADIUS_MAX = 800; // safety guard against radius like 1e20 and against rendering overload with unexpected brush dynamics
+
   const INPUT = {
     PRESSURE: 0,
     SPEED1: 1,

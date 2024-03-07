@@ -185,6 +185,7 @@ class Manager {
       this.src = "/brushlib.js/assets/img/image_invalid.svg";
     };
 
+
     this.cls = document.getElementById("cls_canvas");
     this.cls.addEventListener("click", this.clearCanvas.bind(this));
 
@@ -267,16 +268,17 @@ class Manager {
     this.divelapse.innerHTML = new Date().getTime() - this.t1;
   }
 
-  updateui() {
-    this.color_h.value = this.currentBrushSetting.color_h.base_value * 100;
-    this.color_s.value = this.currentBrushSetting.color_s.base_value * 100;
-    this.color_v.value = this.currentBrushSetting.color_v.base_value * 100;
+  updateui(options = this.currentBrushSetting) {
+    this.color_h.value = options.color_h.base_value * 100;
+    this.color_s.value = options.color_s.base_value * 100;
+    this.color_v.value = options.color_v.base_value * 100;
 
     this.color_h.nextElementSibling.textContent = this.color_h.value;
     this.color_s.nextElementSibling.textContent = this.color_s.value;
     this.color_v.nextElementSibling.textContent = this.color_v.value;
 
     this.colorbox.innerHTML = this.brushName;
+
 
     this.sizeBrush.value =
       this.currentBrushSetting.radius_logarithmic.base_value;
@@ -312,7 +314,7 @@ class Manager {
     colorBrush.nextElementSibling.nextElementSibling.textContent = `${h.toFixed(
       1
     )} ${s.toFixed(1)} ${v.toFixed(1)}`;
-
+    
     this.updateui();
   }
 
