@@ -185,6 +185,7 @@ class Manager {
       this.src = "/brushlib.js/assets/img/image_invalid.svg";
     };
 
+
     this.cls = document.getElementById("cls_canvas");
     this.cls.addEventListener("click", this.clearCanvas.bind(this));
 
@@ -280,6 +281,7 @@ class Manager {
 
     this.sizeBrush.value = options.radius_logarithmic.base_value;
     this.sizeBrush.nextElementSibling.textContent = this.sizeBrush.value;
+
     this.colorchanged();
   }
 
