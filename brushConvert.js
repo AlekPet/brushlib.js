@@ -17,6 +17,9 @@ function convertBrushMain() {
   const sourceDir = process.argv[3];
   const distDir = process.argv[4];
 
+  const formatNewOld =
+    process.argv[5] && process.argv[5] === "new" ? "new" : "old";
+
   const srcDirMyb = sourceDir ? sourceDir.trim() : "08";
   const pathBrushes = path.join(__dirname, "packs_brushes", srcDirMyb);
 
@@ -101,7 +104,11 @@ function convertBrushMain() {
 
         if (ext === "myb") {
           filename = correctionFilename(filename);
-          promises.push(readFileAsync(pathFile, { filename }));
+          if (formatNewOld === "old") {
+            promises.push(readFileAsync(pathFile, { filename }));
+          } else {
+            promises.push(convertMybToJs(pen, { filename }));
+          }
         }
 
         if (ext === "png") {
@@ -147,7 +154,7 @@ function convertBrushMain() {
   );
 
   // New version myb (json)
-  function convertMybToJs(pen) {
+  function convertMybToJs(pen, options) {
     let mybjs = {};
     for (let prop in pen.settings) {
       let { base_value, inputs: pointsList } = pen.settings[prop];
@@ -166,7 +173,7 @@ function convertBrushMain() {
       }
     }
 
-    return mybjs;
+    return { data: mybjs, options };
   }
 
   // Old version myb

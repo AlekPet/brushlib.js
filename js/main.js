@@ -25,6 +25,49 @@ async function getDataJSON(url) {
   }
 }
 
+// https://gist.github.com/mjackson/5311256#file-color-conversion-algorithms-js-L84
+function rgbToHsv(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+
+  let max = Math.max(r, g, b),
+    min = Math.min(r, g, b),
+    h,
+    s,
+    v = max,
+    d = max - min;
+  s = max == 0 ? 0 : d / max;
+
+  if (max == min) {
+    h = 0; // achromatic
+  } else {
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+
+    h /= 6;
+  }
+
+  return [h, s, v];
+}
+
+function hex2rgb(hex) {
+  return [
+    ("0x" + hex[1] + hex[2]) | 0,
+    ("0x" + hex[3] + hex[4]) | 0,
+    ("0x" + hex[5] + hex[6]) | 0,
+  ];
+}
+
 class Manager {
   _instance = null;
   constructor() {
@@ -60,6 +103,7 @@ class Manager {
     document.querySelector(".box__canvas").append(this.canvas);
 
     this.surface = new MypaintSurface(this.canvas);
+    this.surface.clearCanvas();
 
     this.currentBrushSetting = await getDataJSON(
       `${this.basePath}/brushes/${this.brushName}.myb.json`
@@ -93,6 +137,12 @@ class Manager {
     this.getcolor_count = document.getElementById("getcolor_count");
     // ---
     this.colorbox = document.getElementById("colorbox");
+    // ---
+    this.colorBrush = document.getElementById("brushcolor");
+    this.colorBrush.addEventListener("input", this.colorBrushSet.bind(this));
+    // ---
+    this.sizeBrush = document.getElementById("brushsize");
+    this.sizeBrush.addEventListener("input", this.setBrushSize.bind(this));
     // ---
     this.bsel = document.getElementById("brushselector");
     this.bsel.addEventListener("change", this.selectbrush.bind(this));
@@ -138,7 +188,7 @@ class Manager {
     this.cls = document.getElementById("cls_canvas");
     this.cls.addEventListener("click", this.clearCanvas.bind(this));
 
-    this.updateui(this.currentBrushSetting);
+    this.updateui();
   }
 
   clearCanvas() {
@@ -205,7 +255,7 @@ class Manager {
     this.divelapse.innerHTML = `X: ${curX} Y: ${curY}`;
 
     const time = (new Date().getTime() - this.t1) / 1000;
-    this.brush.stroke_to(this.surface, curX, curY, pressure, 90, 0, time);
+    this.brush.stroke_to(curX, curY, pressure, 90, 0, time);
   }
 
   updatestatus() {
@@ -228,6 +278,10 @@ class Manager {
 
     this.colorbox.innerHTML = this.brushName;
 
+    this.sizeBrush.value =
+      this.currentBrushSetting.radius_logarithmic.base_value;
+    this.sizeBrush.nextElementSibling.textContent = this.sizeBrush.value;
+
     this.colorchanged();
   }
 
@@ -235,6 +289,31 @@ class Manager {
     this.mousepressure.nextElementSibling.textContent = (
       this.mousepressure.value / 100
     ).toFixed(2);
+  }
+
+  setBrushSize(e) {
+    const sizeBrush = e.currentTarget || e;
+    const bs = this.currentBrushSetting;
+
+    bs.radius_logarithmic.base_value = sizeBrush.value;
+    this.brush.readmyb_json(bs);
+  }
+
+  colorBrushSet(e) {
+    const colorBrush = e.currentTarget || e;
+    const [r, g, b] = hex2rgb(colorBrush.value);
+    const [h, s, v] = rgbToHsv(r, g, b);
+
+    this.currentBrushSetting.color_h.base_value = h;
+    this.currentBrushSetting.color_s.base_value = s;
+    this.currentBrushSetting.color_v.base_value = v;
+
+    colorBrush.nextElementSibling.textContent = `${r} ${g} ${b}`;
+    colorBrush.nextElementSibling.nextElementSibling.textContent = `${h.toFixed(
+      1
+    )} ${s.toFixed(1)} ${v.toFixed(1)}`;
+
+    this.updateui();
   }
 
   colorchanged() {
@@ -267,7 +346,17 @@ class Manager {
     if (gg.length < 2) gg = `0${gg}`;
     if (bb.length < 2) bb = `0${bb}`;
 
-    this.colorbox.style.backgroundColor = "#" + rr + gg + bb;
+    let res =
+      Math.floor(colorhsv.r * 255) +
+      Math.floor(colorhsv.g * 255) +
+      Math.floor(colorhsv.b * 255);
+
+    res = res <= 510;
+
+    const colorStr = `#${rr}${gg}${bb}`;
+    this.colorbox.style.backgroundColor = colorStr;
+    this.colorbox.style.color = res ? "white" : "black";
+    this.colorBrush.value = colorStr;
   }
 
   async selectbrush() {
