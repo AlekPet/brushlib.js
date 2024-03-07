@@ -17,11 +17,8 @@ function convertBrushMain() {
   const sourceDir = process.argv[3];
   const distDir = process.argv[4];
 
-  const formatNewOld =
-    process.argv[5] && process.argv[5] === "new" ? "new" : "old";
-
-  const srcDirMyb = sourceDir ? sourceDir.trim() : "08";
-  const pathBrushes = path.join(__dirname, "packs_brushes", srcDirMyb);
+  const srcDirMyb = sourceDir ? sourceDir.trim() : "packs_brushes";
+  const pathBrushes = path.join(__dirname, srcDirMyb);
 
   if (!fs.existsSync(pathBrushes)) {
     console.error(new Error(`File path not exists "${pathBrushes}"`));
@@ -30,7 +27,7 @@ function convertBrushMain() {
 
   const saveBrushes = distDir
     ? path.join(__dirname, distDir.trim())
-    : path.join(__dirname, "brushes", srcDirMyb);
+    : path.join(__dirname, "brushes");
 
   const filterPropsMissing = ["#"];
   const useJsonFile = true;
@@ -54,107 +51,119 @@ function convertBrushMain() {
     return filename;
   }
 
-  const readFileAsync = (pathFile, options) => {
+  function readDataOldMyb(data, options) {
+    let lines = data.split("\n");
+    lines = lines.filter((line) => line.trim() !== "" && !isInvalidProp(line));
+    lines = lines.map((line) => getData(line, options.filename));
+
+    const nulls = lines.filter((v) => v === null);
+    if (nulls.length > 0) {
+      return null;
+    }
+
+    let endObj;
+    lines.forEach((prop) => {
+      endObj = { ...endObj, ...prop };
+    });
+    return endObj;
+  }
+
+  function readFileAsync(pathFile, options) {
     return new Promise((res, rej) => {
       fs.readFile(pathFile, "utf8", (err, data) => {
         if (err) rej(err);
 
-        let lines = data.split("\n");
-        lines = lines.filter(
-          (line) => line.trim() !== "" && !isInvalidProp(line)
-        );
-        lines = lines.map((line) => getData(line, options.filename));
-
-        const nulls = lines.filter((v) => v === null);
-        if (nulls.length > 0) {
-          res({});
-        }
-
         let endObj;
-        lines.forEach((prop) => {
-          endObj = { ...endObj, ...prop };
-        });
+        try {
+          const jsonData = JSON.parse(data);
+          endObj = getDataJSON(jsonData, options);
+        } catch (error) {
+          // console.log("Not JSON file!");
+          endObj = readDataOldMyb(data, options);
+          if (endObj === null) rej({});
+        }
 
         res({ data: endObj, options });
       });
     });
-  };
+  }
 
-  fs.mkdirSync(saveBrushes, {
-    recursive: true,
-  });
+  function readPacksDir(_dir) {
+    // const saveBrushes = path.join(__dirname, "brushes");
+    // const pathBrushes = path.join(__dirname, "packs_brushes");
+    const promises = [];
 
-  fs.readdir(
-    pathBrushes,
-    {
-      withFileTypes: true,
-    },
-    (err, files) => {
-      if (err) throw err;
-
-      const promises = [];
+    function readDirectories(dir) {
+      const files = fs.readdirSync(dir, {
+        withFileTypes: true,
+      });
 
       files.forEach((file) => {
-        if (file.isDirectory()) return;
+        const pathFile = path.resolve(dir, file.name);
+        const relativePath = path.relative(pathBrushes, dir);
+        const dest = path.join(saveBrushes, relativePath);
+        const destToFile = path.join(dest, file.name);
 
-        const pathFile = path.resolve(pathBrushes, file.name);
+        if (file.isDirectory()) {
+          fs.mkdirSync(destToFile, {
+            recursive: true,
+          });
+
+          return readDirectories(pathFile);
+        }
 
         const ext = path.extname(pathFile).slice(1);
         let filename = path.parse(pathFile).name;
 
         if (ext === "myb") {
           filename = correctionFilename(filename);
-          if (formatNewOld === "old") {
-            promises.push(readFileAsync(pathFile, { filename }));
-          } else {
-            promises.push(convertMybToJs(pen, { filename }));
-          }
+          promises.push(readFileAsync(pathFile, { filename, dest }));
         }
 
         if (ext === "png") {
           filename = correctionFilename(filename);
           filename = filename.replace("_prev", "");
-          fs.copyFileSync(
-            pathFile,
-            path.join(saveBrushes, `${filename}.${ext}`)
-          );
+          fs.copyFileSync(pathFile, path.join(dest, `${filename}.${ext}`));
         }
       });
-
-      let countComplete = 0;
-      Promise.all(promises).then((results) => {
-        results.forEach((response) => {
-          if (!Object.keys(response).length) return true;
-
-          const {
-            data,
-            options: { filename },
-          } = response;
-
-          const dataToText = !useJsonFile
-            ? `var ${filename} = ${JSON.stringify(data)}`
-            : JSON.stringify(data);
-
-          const fileSave = fs.createWriteStream(
-            path.join(
-              saveBrushes,
-              `${filename}.myb.${!useJsonFile ? "js" : "json"}`
-            )
-          );
-
-          fileSave.write(dataToText);
-          countComplete += 1;
-        });
-
-        console.log(`Files converted ${countComplete} of ${promises.length}!`);
-
-        runMakeJSONAfterConvert();
-      });
     }
-  );
+
+    // First run directory
+    readDirectories(_dir);
+
+    let countComplete = 0;
+    Promise.all(promises).then((results) => {
+      results.forEach((response) => {
+        if (!Object.keys(response).length) return true;
+
+        const {
+          data,
+          options: { filename, dest },
+        } = response;
+
+        const dataToText = !useJsonFile
+          ? `var ${filename} = ${JSON.stringify(data)}`
+          : JSON.stringify(data);
+
+        const fileSave = fs.createWriteStream(
+          path.join(dest, `${filename}.myb.${!useJsonFile ? "js" : "json"}`)
+        );
+
+        fileSave.write(dataToText);
+        countComplete += 1;
+      });
+
+      console.log(`Files converted ${countComplete} of ${promises.length}!`);
+
+      runMakeJSONAfterConvert();
+    });
+  }
+
+  // Read direcory packs_brushes
+  readPacksDir(path.join(__dirname, "packs_brushes"));
 
   // New version myb (json)
-  function convertMybToJs(pen, options) {
+  function getDataJSON(pen, options) {
     let mybjs = {};
     for (let prop in pen.settings) {
       let { base_value, inputs: pointsList } = pen.settings[prop];
@@ -228,7 +237,7 @@ async function getAvailableBrushes() {
       withFileTypes: true,
     });
 
-    files.forEach(async (file) => {
+    files.forEach((file) => {
       const source = path.join(dir, file.name);
 
       if (file.isDirectory()) {
