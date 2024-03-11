@@ -5,9 +5,9 @@
  * -----------------------------------
  * Info:
  * Old brush packs: https://github.com/mypaint/mypaint-brushes/releases/tag/pre_json_brushes
- * Folder "08" it is pack brush, put in root project
- * Folder "08_save" folder converted brush from mybrushlib.js
- * File "select_options.txt" includes after converted option tags for select tag brushes.
+ * Folder "packs_brushes" it is packs brushe to convert
+ * Folder "brushes" folder converted brush from mybrushlib.js
+ * File "brushes_data.json" includes after converted option tags for select tag brushes.
  */
 
 const fs = require("fs");
@@ -51,23 +51,6 @@ function convertBrushMain() {
     return filename;
   }
 
-  function readDataOldMyb(data, options) {
-    let lines = data.split("\n");
-    lines = lines.filter((line) => line.trim() !== "" && !isInvalidProp(line));
-    lines = lines.map((line) => getData(line, options.filename));
-
-    const nulls = lines.filter((v) => v === null);
-    if (nulls.length > 0) {
-      return null;
-    }
-
-    let endObj;
-    lines.forEach((prop) => {
-      endObj = { ...endObj, ...prop };
-    });
-    return endObj;
-  }
-
   function readFileAsync(pathFile, options) {
     return new Promise((res, rej) => {
       fs.readFile(pathFile, "utf8", (err, data) => {
@@ -76,7 +59,7 @@ function convertBrushMain() {
         let endObj;
         try {
           const jsonData = JSON.parse(data);
-          endObj = getDataJSON(jsonData, options);
+          endObj = getDataJSON(jsonData);
         } catch (error) {
           // console.log("Not JSON file!");
           endObj = readDataOldMyb(data, options);
@@ -89,8 +72,6 @@ function convertBrushMain() {
   }
 
   function readPacksDir(_dir) {
-    // const saveBrushes = path.join(__dirname, "brushes");
-    // const pathBrushes = path.join(__dirname, "packs_brushes");
     const promises = [];
 
     function readDirectories(dir) {
@@ -115,13 +96,15 @@ function convertBrushMain() {
         const ext = path.extname(pathFile).slice(1);
         let filename = path.parse(pathFile).name;
 
-        if (ext === "myb") {
+        if (ext === "myb" || ext === "png") {
           filename = correctionFilename(filename);
+        }
+
+        if (ext === "myb") {
           promises.push(readFileAsync(pathFile, { filename, dest }));
         }
 
         if (ext === "png") {
-          filename = correctionFilename(filename);
           filename = filename.replace("_prev", "");
           fs.copyFileSync(pathFile, path.join(dest, `${filename}.${ext}`));
         }
@@ -163,8 +146,8 @@ function convertBrushMain() {
   readPacksDir(path.join(__dirname, "packs_brushes"));
 
   // New version myb (json)
-  function getDataJSON(pen, options) {
-    let mybjs = {};
+  function getDataJSON(pen) {
+    let settings = {};
     for (let prop in pen.settings) {
       let { base_value, inputs: pointsList } = pen.settings[prop];
       if (Object.keys(pointsList).length) {
@@ -176,16 +159,34 @@ function convertBrushMain() {
           }
         });
 
-        mybjs[prop] = { base_value, pointsList: objp };
+        settings[prop] = { base_value, pointsList: objp };
       } else {
-        mybjs[prop] = { base_value };
+        settings[prop] = { base_value };
       }
     }
 
-    return { data: mybjs, options };
+    return settings;
   }
+  // end - New version myb (json)
 
   // Old version myb
+  function readDataOldMyb(data) {
+    let lines = data.split("\n");
+    lines = lines.filter((line) => line.trim() !== "" && !isInvalidProp(line));
+    lines = lines.map((line) => getData(line, options.filename));
+
+    const nulls = lines.filter((v) => v === null);
+    if (nulls.length > 0) {
+      return null;
+    }
+
+    let endObj;
+    lines.forEach((prop) => {
+      endObj = { ...endObj, ...prop };
+    });
+    return endObj;
+  }
+
   function getData(str, filename) {
     const obj = {};
     if (str.includes("|")) {
@@ -224,6 +225,7 @@ function convertBrushMain() {
     }
     return obj;
   }
+  // end - Old version myb
 }
 
 async function getAvailableBrushes() {
