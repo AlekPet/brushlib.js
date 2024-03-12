@@ -1260,10 +1260,9 @@
           (current_optical_radius + min_fadeout_in_pixels / 2.0);
         const radius_new = min_fadeout_in_pixels / (1.0 - hardness_new);
 
-        hardness = hardness_new;
+        hardness = Math.abs(hardness_new);
         radius = radius_new;
       }
-      //
 
       return this.surface.draw_dab(
         x,
