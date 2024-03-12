@@ -13,6 +13,7 @@
 const fs = require("fs");
 const path = require("path");
 
+// Convert myb files in the support javascript library mybrushlib
 function convertBrushMain() {
   const sourceDir = process.argv[3];
   const distDir = process.argv[4];
@@ -125,8 +126,8 @@ function convertBrushMain() {
         } = response;
 
         const dataToText = !useJsonFile
-          ? `var ${filename} = ${JSON.stringify(data)}`
-          : JSON.stringify(data);
+          ? `var ${filename} = ${JSON.stringify(data, null, 4)}`
+          : JSON.stringify(data, null, 4);
 
         const fileSave = fs.createWriteStream(
           path.join(dest, `${filename}.myb.${!useJsonFile ? "js" : "json"}`)
@@ -228,6 +229,7 @@ function convertBrushMain() {
   // end - Old version myb
 }
 
+// Get aviables brushes in the brush directory
 async function getAvailableBrushes() {
   const listBrushed = {
     brushes: [],
@@ -272,11 +274,15 @@ async function getAvailableBrushes() {
     return files;
   }
 
+  // Read files brushes myb in the folder brushes
   await readDir(sourceDir);
+
+  // Create json files contains all folders(category) with all brushes
   fs.writeFileSync(
     path.join(__dirname, "js", "brushes_data.json"),
-    JSON.stringify(listBrushed)
+    JSON.stringify(listBrushed, null, 4)
   );
+
   console.log(
     `Complete:
 Brushes files get: ${Object.keys(listBrushed).reduce(
@@ -286,6 +292,7 @@ Brushes files get: ${Object.keys(listBrushed).reduce(
   );
 }
 
+// Question make json file avaibles brushes after convert files myb
 function runMakeJSONAfterConvert() {
   const readline = require("readline");
   const readLine = readline.createInterface({
@@ -301,12 +308,13 @@ function runMakeJSONAfterConvert() {
   });
 }
 
+// Start function
 function init() {
   if (!process.argv[2] || process.argv[2] === "convert") {
     convertBrushMain();
   }
 
-  if (process.argv[2] === "getbrush") {
+  if (process.argv[2] === "getbrushes") {
     getAvailableBrushes();
   }
 }
