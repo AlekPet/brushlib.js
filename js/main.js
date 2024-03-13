@@ -1,6 +1,3 @@
-// Wacom Browser Plugin can be download from
-// http://www.wacom.com/CustomerCare/Plugin.aspx
-
 async function getDataJSON(url) {
   try {
     const response = await fetch(url);
@@ -219,9 +216,13 @@ class Manager {
   }
 
   pointermove(evt) {
+    // Wacom Browser Plugin can be download from
+    // http://www.wacom.com/CustomerCare/Plugin.aspx
     const plugin = document.embeds["wacom-plugin"];
+
     let { pressure: pressurePointer, pointerType, button } = evt;
     let pressure = this.mousepressure.value / 100;
+
     let isEraser;
     let curX = 0;
     let curY = 0;

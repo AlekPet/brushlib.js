@@ -1248,7 +1248,7 @@
       colorhsv = new ColorHSV(color_h, color_s, color_v);
       colorhsv.hsv_to_rgb_float();
 
-      // Ant-alising
+      // Anti-alising
       const current_fadeout_in_pixels = radius * (1.0 - hardness);
       const min_fadeout_in_pixels = this.settings_value[BRUSH.ANTI_ALIASING];
 
