@@ -5,9 +5,9 @@
  * -----------------------------------
  * Info:
  * Old brush packs: https://github.com/mypaint/mypaint-brushes/releases/tag/pre_json_brushes
- * Folder "packs_brushes" it is packs brushe to convert
+ * Folder "packs_brushes" it is packs brushes to convert
  * Folder "brushes" folder converted brush from mybrushlib.js
- * File "brushes_data.json" includes after converted option tags for select tag brushes.
+ * File "brushes_data.json" includes list all availables brushes after converter.
  */
 
 const fs = require("fs");
@@ -98,7 +98,7 @@ function convertBrushMain() {
         let filename = path.parse(pathFile).name;
 
         if (ext === "myb" || ext === "png") {
-          filename = correctionFilename(filename);
+          if (!useJsonFile) filename = correctionFilename(filename);
         }
 
         if (ext === "myb") {
@@ -106,7 +106,8 @@ function convertBrushMain() {
         }
 
         if (ext === "png") {
-          filename = filename.replace("_prev", "");
+          if (!useJsonFile) filename = filename.replace("_prev", "");
+
           fs.copyFileSync(pathFile, path.join(dest, `${filename}.${ext}`));
         }
       });
@@ -174,7 +175,7 @@ function convertBrushMain() {
   function readDataOldMyb(data) {
     let lines = data.split("\n");
     lines = lines.filter((line) => line.trim() !== "" && !isInvalidProp(line));
-    lines = lines.map((line) => getData(line, options.filename));
+    lines = lines.map((line) => getData(line));
 
     const nulls = lines.filter((v) => v === null);
     if (nulls.length > 0) {
@@ -188,7 +189,7 @@ function convertBrushMain() {
     return endObj;
   }
 
-  function getData(str, filename) {
+  function getData(str) {
     const obj = {};
     if (str.includes("|")) {
       let vals = str.split("|").map((v) => v.trim());
@@ -314,7 +315,7 @@ function init() {
     convertBrushMain();
   }
 
-  if (process.argv[2] === "getbrushes") {
+  if (process.argv[2] === "brushes") {
     getAvailableBrushes();
   }
 }

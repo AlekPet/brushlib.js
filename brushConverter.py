@@ -2,6 +2,12 @@
  * Title: BrushConverter
  * Author: Aleksey Petrov (AlekPet)
  * Guthub: https://github.com/AlekPet
+ *
+ * Info:
+ * Old brush packs: https://github.com/mypaint/mypaint-brushes/releases/tag/pre_json_brushes
+ * Folder "packs_brushes" it is packs brushes to convert
+ * Folder "brushes" folder converted brush from mybrushlib.js
+ * File "brushes_data.json" includes list all availables brushes after converter.
  * -----------------------------------
  '''
 import os
@@ -54,11 +60,11 @@ def convertBrushMain(*args:tuple) -> None:
     
 
     # Old version myb:
-    def getData(str:str) -> dict:
+    def getData(strval:str) -> dict:
         obj:dict = {}
         
-        if "|" in str:
-            vals = list(map(lambda v: v.strip(), str.split("|")))
+        if "|" in strval:
+            vals = list(map(lambda v: v.strip(), strval.split("|")))
             if len(vals) == 2:
                 name, propValue = list(map(lambda v: v.strip(), vals[0].split(" ")))
                 propval = deque(map(lambda v: v.strip(), vals[1].split(" ")))
@@ -74,21 +80,29 @@ def convertBrushMain(*args:tuple) -> None:
                 
             else:
                 name, propValue = list(map(lambda v: v.strip(), vals[0].split(" ")))
+                
+                if isinstance(propValue, str) and propValue.replace(".", "", 1).isdigit():
+                    propValue = float(propValue)
+                
                 obj[name] = {
-                    "base_value": float(propValue),
+                    "base_value": propValue,
                     "pointsList": {},
                 }
 
                 for i in range(1, len(vals)):
                     propval = deque(map(lambda v: v.strip(), vals[i].split(" ")))
                     propname = propval.popleft()
-                    propval =  map(lambda v: int(re.sub("[(),]"), "", v), propval)
+                    propval =  list(map(lambda v: float(re.sub("[(),]", "", v)), propval))
 
                     obj[name]['pointsList'][propname] = propval
         else:
-            name, propValue = list(map(lambda v: v.strip(), str.split(" ")))
+            name, propValue = list(map(lambda v: v.strip(), strval.split(" ")))
+            
+            if isinstance(propValue, str) and propValue.replace(".", "", 1).isdigit():
+                propValue = float(propValue)
+            
             obj[name] = {
-                "base_value": float(propValue),
+                "base_value": propValue,
             }
 
         return obj 
@@ -202,7 +216,11 @@ def convertBrushMain(*args:tuple) -> None:
                                           })
 
                     if ext == "png":
-                        filename = filename.replace("_prev", "") + '.' + ext
+                        if not useJsonFile:
+                            filename = filename.replace("_prev", "") + '.' + ext
+                        else:
+                            filename = file
+                            
                         savePath = os.path.join(destDir, filename)
                         if not os.path.exists(savePath):
                             shutil.copyfile(pathToFile, savePath)
@@ -219,11 +237,14 @@ def convertBrushMain(*args:tuple) -> None:
             filename = props['options']['filename']
             dest = props['options']['dest']
 
-            dataToText = f"var {filename} = {json.dumps(data)}" if not useJsonFile else json.dumps(data, indent=4)
+            try:
+                dataToText = f"var {filename} = {json.dumps(data)}" if not useJsonFile else json.dumps(data, indent=4)
 
-            with open(os.path.join(dest, f"{filename}.myb.{'js' if not useJsonFile else 'json'}"), 'w', encoding="utf-8") as fsave:
-                fsave.write(dataToText)                    
-                countComplete+=1
+                with open(os.path.join(dest, f"{filename}.myb.{'js' if not useJsonFile else 'json'}"), 'w', encoding="utf-8") as fsave:
+                    fsave.write(dataToText)                    
+                    countComplete+=1
+            except:
+                print(f'Error file JSON serializable: {filename}')
                 
                 
         print(f"Files converted {countComplete} of {len(propFiles)}!")
@@ -263,7 +284,6 @@ def getAvailableBrushes():
 
             if ext == 'json':
                 keyObj = file_basename
-                print(file_basename , currentDir)
                 if file_basename == '': # myb in the root folder brushes
                     keyObj = 'brushes'
 
@@ -290,7 +310,7 @@ def init():
   
 * Available commands:
     convert
-    getbrushes
+    brushes
 
     Example: python brushConvereter.py convert src(optional) dst(optional)    
 ===========================================
@@ -298,7 +318,7 @@ def init():
     if 'convert' in sys.argv:
         convertBrushMain(sys.argv)
     
-    if 'getbrushes' in sys.argv:
+    if 'brushes' in sys.argv:
         getAvailableBrushes()
         
 

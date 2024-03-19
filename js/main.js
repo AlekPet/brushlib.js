@@ -93,8 +93,11 @@ class Manager {
     const brushesData = await getDataJSON(
       `${this.basePath}/js/brushes_data.json`
     );
+
     let currentDir = null;
     let defaultLoad = false;
+    let pathDef = null;
+
     Object.keys(brushesData).forEach((dir) => {
       const currentDirVals = brushesData[dir];
       if (!currentDir) currentDir = dir;
@@ -117,6 +120,7 @@ class Manager {
         if (filename === this.brushName) {
           defaultLoad = true;
           option.selected = true;
+          pathDef = `${option.dataset.path}${this.brushName}`;
         }
 
         this.bsel.append(option);
@@ -124,7 +128,6 @@ class Manager {
       });
     });
 
-    let pathDef = `brushes/${this.brushName}`;
     // Default brush not exists load first in the avaibles brushes
     if (!defaultLoad) {
       var optionsDef = Array.from(this.bsel.options).filter(
@@ -132,7 +135,7 @@ class Manager {
       );
       optionsDef[0].selected = true;
       this.brushName = optionsDef[0].value;
-      pathDef = `${optionsDef[0].dataset.path}${this.brushName}`;
+      pathDef = encodeURI(`${optionsDef[0].dataset.path}${this.brushName}`);
     }
 
     this.currentBrushSetting = await getDataJSON(
@@ -180,10 +183,10 @@ class Manager {
     this.sizeBrush.addEventListener("input", this.setBrushSize.bind(this));
     // ---
     this.brush_img = document.getElementById("brush_img");
-
     this.brush_img.onerror = function () {
       this.src = "/brushlib.js/assets/img/image_invalid.svg";
     };
+    this.brush_img.src = `${this.basePath}/${pathDef}_prev.png`;
 
     this.cls = document.getElementById("cls_canvas");
     this.cls.addEventListener("click", this.clearCanvas.bind(this));
@@ -381,7 +384,7 @@ class Manager {
     this.currentBrushSetting = await getDataJSON(`${pathToJsonBrush}.myb.json`);
 
     this.brush = new MypaintBrush(this.currentBrushSetting, this.surface);
-    this.brush_img.src = `${pathToJsonBrush}.png`;
+    this.brush_img.src = encodeURI(`${pathToJsonBrush}_prev.png`);
 
     this.updateui();
   }
