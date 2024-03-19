@@ -115,7 +115,7 @@ class Manager {
         const option = document.createElement("option");
         option.value = filename;
         option.textContent = filename[0].toUpperCase() + filename.slice(1);
-        option.dataset.path = `brushes/${path}/`;
+        option.dataset.path = `brushes/${path === "/" ? "" : path + "/"}`;
 
         if (filename === this.brushName) {
           defaultLoad = true;

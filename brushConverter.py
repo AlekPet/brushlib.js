@@ -238,7 +238,7 @@ def convertBrushMain(*args:tuple) -> None:
             dest = props['options']['dest']
 
             try:
-                dataToText = f"var {filename} = {json.dumps(data)}" if not useJsonFile else json.dumps(data, indent=4)
+                dataToText = f"var {filename} = {json.dumps(data)}" if not useJsonFile else json.dumps(data, indent=2)
 
                 with open(os.path.join(dest, f"{filename}.myb.{'js' if not useJsonFile else 'json'}"), 'w', encoding="utf-8") as fsave:
                     fsave.write(dataToText)                    
@@ -272,7 +272,6 @@ def getAvailableBrushes():
 
         for file in files:
             file_basename = os.path.basename(root)
-            pathToFile = os.path.join(file_basename, file)
             
             filename_tmp:list = file.split('.')
             if len(filename_tmp) > 1:
@@ -290,12 +289,12 @@ def getAvailableBrushes():
                 listBrushes[keyObj].append({
                     # 'file': file
                     'filename': filename,
-                    'path': file_basename if file_basename != sourceDirBaseName else '',
+                    'path': file_basename if file_basename != sourceDirBaseName else '/',
                     # 'path_json': pathToFile
                 })
     
     with open(os.path.join(currentDir, 'js', 'brushes_data.json'), 'w', encoding='utf-8') as jsonSave:
-        json.dump(listBrushes, jsonSave, indent=4)
+        json.dump(listBrushes, jsonSave, indent=2)
         print(f"""Complete:
 Brushes files get: {reduce(lambda acc,cur: acc + len(listBrushes[cur]), listBrushes.keys(), 0)}, foldres {len(listBrushes)}""")
         

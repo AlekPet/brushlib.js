@@ -127,8 +127,8 @@ function convertBrushMain() {
         } = response;
 
         const dataToText = !useJsonFile
-          ? `var ${filename} = ${JSON.stringify(data, null, 4)}`
-          : JSON.stringify(data, null, 4);
+          ? `var ${filename} = ${JSON.stringify(data, null, 2)}`
+          : JSON.stringify(data, null, 2);
 
         const fileSave = fs.createWriteStream(
           path.join(dest, `${filename}.myb.${!useJsonFile ? "js" : "json"}`)
@@ -261,6 +261,7 @@ async function getAvailableBrushes() {
         let keyObject = pathRelative;
         if (pathRelative === "") {
           keyObject = "brushes";
+          pathRelative = "/";
         }
 
         listBrushed[keyObject].push({
@@ -281,7 +282,7 @@ async function getAvailableBrushes() {
   // Create json files contains all folders(category) with all brushes
   fs.writeFileSync(
     path.join(__dirname, "js", "brushes_data.json"),
-    JSON.stringify(listBrushed, null, 4)
+    JSON.stringify(listBrushed, null, 2)
   );
 
   console.log(
