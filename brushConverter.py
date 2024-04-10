@@ -314,7 +314,7 @@ def init():
     Example: python brushConvereter.py convert src(optional) dst(optional)    
 ===========================================
 ''')
-    if 'convert' in sys.argv:
+    if 'convert' in sys.argv or len(sys.argv) == 1:
         convertBrushMain(sys.argv)
     
     if 'brushes' in sys.argv:

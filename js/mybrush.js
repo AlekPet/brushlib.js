@@ -508,9 +508,13 @@
 
       let g1;
       if (hardness < 1) {
-        g1 = this.context.createRadialGradient(0, 0, 0, 0, 0, radius);
-        g1.addColorStop(hardness, `rgba(${rr},${gg},${bb},${opaque})`);
-        g1.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+        try {
+          g1 = this.context.createRadialGradient(0, 0, 0, 0, 0, radius);
+          g1.addColorStop(hardness, `rgba(${rr},${gg},${bb},${opaque})`);
+          g1.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+        } catch (error) {
+          console.log(error);
+        }
       } else {
         g1 = `rgba(${rr},${gg},${bb},${opaque})`;
       }
@@ -745,6 +749,13 @@
 
         const settingsPointsList = settings[setting].pointsList;
         for (const prop in settingsPointsList) {
+          if (!INPUT.hasOwnProperty(prop.toUpperCase())) {
+            console.error(
+              `Property input "${prop.toUpperCase()}" not exists in setting: ${currentSetting}`
+            );
+            continue;
+          }
+
           const propidx = INPUT[prop.toUpperCase()];
           m.pointsList[propidx].n = settingsPointsList[prop].length / 2;
 
