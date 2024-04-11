@@ -17,7 +17,7 @@
     }
   },
   "hardness": {
-    "base_value": 1.0,
+    "base_value": 0.2,
     "pointsList": {
       "pressure": [0.0, 0.0, 1.0, 0.65],
       "speed1": [0.0, 0.065, 1.0, -0.09]
