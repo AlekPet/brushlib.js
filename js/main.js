@@ -1,19 +1,3 @@
-// Wacom Browser Plugin can be download from
-// http://www.wacom.com/CustomerCare/Plugin.aspx
-
-function findPos(obj) {
-  var curleft = (curtop = 0);
-  if (obj.offsetParent) {
-    curleft = obj.offsetLeft;
-    curtop = obj.offsetTop;
-    while ((obj = obj.offsetParent)) {
-      curleft += obj.offsetLeft;
-      curtop += obj.offsetTop;
-    }
-  }
-  return { x: curleft, y: curtop };
-}
-
 async function getDataJSON(url) {
   try {
     const response = await fetch(url);
@@ -102,14 +86,67 @@ class Manager {
     this.canvas.height = 500;
     document.querySelector(".box__canvas").append(this.canvas);
 
-    this.surface = new MypaintSurface(this.canvas);
-    this.surface.clearCanvas();
+    // ---
+    this.bsel = document.getElementById("brushselector");
+    this.bsel.addEventListener("change", this.selectbrush.bind(this));
+    // ---
+    const brushesData = await getDataJSON(
+      `${this.basePath}/js/brushes_data.json`
+    );
+
+    let currentDir = null;
+    let defaultLoad = false;
+    let pathDef = null;
+
+    Object.keys(brushesData).forEach((dir) => {
+      const { items, path } = brushesData[dir];
+      if (!currentDir) currentDir = dir;
+
+      if (currentDir !== dir) {
+        const option = document.createElement("option");
+        option.value = "separator";
+        option.textContent = `-------------- ${dir} --------------`;
+        currentDir = dir;
+        this.bsel.append(option);
+      }
+
+      items.forEach((brushData) => {
+        const option = document.createElement("option");
+        option.value = brushData;
+        option.textContent = brushData[0].toUpperCase() + brushData.slice(1);
+        option.dataset.path = `brushes/${path === "/" ? "" : path + "/"}`;
+
+        if (brushData === this.brushName) {
+          defaultLoad = true;
+          option.selected = true;
+          pathDef = `${option.dataset.path}${this.brushName}`;
+        }
+
+        this.bsel.append(option);
+        currentDir = dir;
+      });
+    });
+
+    // Default brush not exists load first in the avaibles brushes
+    if (!defaultLoad) {
+      var optionsDef = Array.from(this.bsel.options).filter(
+        (opEl) => opEl.value !== "separator"
+      );
+      optionsDef[0].selected = true;
+      this.brushName = optionsDef[0].value;
+      pathDef = encodeURI(`${optionsDef[0].dataset.path}${this.brushName}`);
+    }
 
     this.currentBrushSetting = await getDataJSON(
-      `${this.basePath}/brushes/${this.brushName}.myb.json`
+      `${this.basePath}/${pathDef}.myb.json`
     );
+
+    // Surface and brush make and settings
+    this.surface = new MypaintSurface(this.canvas);
+    this.surface.clearCanvas();
     this.brush = new MypaintBrush(this.currentBrushSetting, this.surface);
 
+    // ---
     this.pointerMoveHandler = this.pointermove.bind(this);
     this.canvas.addEventListener("pointerdown", this.pointerdown.bind(this));
     this.canvas.addEventListener("pointerup", this.pointerup.bind(this));
@@ -144,47 +181,11 @@ class Manager {
     this.sizeBrush = document.getElementById("brushsize");
     this.sizeBrush.addEventListener("input", this.setBrushSize.bind(this));
     // ---
-    this.bsel = document.getElementById("brushselector");
-    this.bsel.addEventListener("change", this.selectbrush.bind(this));
-
-    const brushesData = await getDataJSON(
-      `${this.basePath}/js/brushes_data.json`
-    );
-
-    let currentDir = null;
-    Object.keys(brushesData).forEach((dir) => {
-      const currentDirVals = brushesData[dir];
-      if (!currentDir) currentDir = dir;
-
-      if (currentDir !== dir) {
-        const option = document.createElement("option");
-        option.value = "separator";
-        option.textContent = `-------------- ${dir} --------------`;
-        currentDir = dir;
-        this.bsel.append(option);
-      }
-
-      currentDirVals.forEach((brushData) => {
-        const { filename, path } = brushData;
-        const option = document.createElement("option");
-        option.value = filename;
-        option.textContent = filename[0].toUpperCase() + filename.slice(1);
-        option.dataset.path = `brushes/${path}/`;
-
-        if (filename === "charcoal") option.selected = true;
-
-        this.bsel.append(option);
-        currentDir = dir;
-      });
-    });
-
-    // ---
     this.brush_img = document.getElementById("brush_img");
-
     this.brush_img.onerror = function () {
       this.src = "/brushlib.js/assets/img/image_invalid.svg";
     };
-
+    this.brush_img.src = `${this.basePath}/${pathDef}_prev.png`;
 
     this.cls = document.getElementById("cls_canvas");
     this.cls.addEventListener("click", this.clearCanvas.bind(this));
@@ -217,9 +218,13 @@ class Manager {
   }
 
   pointermove(evt) {
+    // Wacom Browser Plugin can be download from
+    // http://www.wacom.com/CustomerCare/Plugin.aspx
     const plugin = document.embeds["wacom-plugin"];
+
     let { pressure: pressurePointer, pointerType, button } = evt;
     let pressure = this.mousepressure.value / 100;
+
     let isEraser;
     let curX = 0;
     let curY = 0;
@@ -268,17 +273,16 @@ class Manager {
     this.divelapse.innerHTML = new Date().getTime() - this.t1;
   }
 
-  updateui(options = this.currentBrushSetting) {
-    this.color_h.value = options.color_h.base_value * 100;
-    this.color_s.value = options.color_s.base_value * 100;
-    this.color_v.value = options.color_v.base_value * 100;
+  updateui() {
+    this.color_h.value = this.currentBrushSetting.color_h.base_value * 100;
+    this.color_s.value = this.currentBrushSetting.color_s.base_value * 100;
+    this.color_v.value = this.currentBrushSetting.color_v.base_value * 100;
 
     this.color_h.nextElementSibling.textContent = this.color_h.value;
     this.color_s.nextElementSibling.textContent = this.color_s.value;
     this.color_v.nextElementSibling.textContent = this.color_v.value;
 
     this.colorbox.innerHTML = this.brushName;
-
 
     this.sizeBrush.value =
       this.currentBrushSetting.radius_logarithmic.base_value;
@@ -297,7 +301,8 @@ class Manager {
     const sizeBrush = e.currentTarget || e;
     const bs = this.currentBrushSetting;
 
-    bs.radius_logarithmic.base_value = sizeBrush.value;
+    bs.radius_logarithmic.base_value = +sizeBrush.value;
+    sizeBrush.nextElementSibling.textContent = sizeBrush.value;
     this.brush.readmyb_json(bs);
   }
 
@@ -314,7 +319,7 @@ class Manager {
     colorBrush.nextElementSibling.nextElementSibling.textContent = `${h.toFixed(
       1
     )} ${s.toFixed(1)} ${v.toFixed(1)}`;
-    
+
     this.updateui();
   }
 
@@ -366,7 +371,9 @@ class Manager {
     const pathToBrush = this.bsel.options[this.bsel.selectedIndex].dataset.path;
 
     if (brushName === "separator" || !pathToBrush) {
-      console.error("Not isset path dataset or brush name incorrect!");
+      console.error(
+        "Not isset path dataset or brush name incorrect (separator)!"
+      );
       return;
     }
 
@@ -376,7 +383,7 @@ class Manager {
     this.currentBrushSetting = await getDataJSON(`${pathToJsonBrush}.myb.json`);
 
     this.brush = new MypaintBrush(this.currentBrushSetting, this.surface);
-    this.brush_img.src = `${pathToJsonBrush}.png`;
+    this.brush_img.src = encodeURI(`${pathToJsonBrush}_prev.png`);
 
     this.updateui();
   }

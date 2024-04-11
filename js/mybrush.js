@@ -508,9 +508,13 @@
 
       let g1;
       if (hardness < 1) {
-        g1 = this.context.createRadialGradient(0, 0, 0, 0, 0, radius);
-        g1.addColorStop(hardness, `rgba(${rr},${gg},${bb},${opaque})`);
-        g1.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+        try {
+          g1 = this.context.createRadialGradient(0, 0, 0, 0, 0, radius);
+          g1.addColorStop(hardness, `rgba(${rr},${gg},${bb},${opaque})`);
+          g1.addColorStop(1, `rgba(${rr},${gg},${bb},0)`);
+        } catch (error) {
+          console.log(error);
+        }
       } else {
         g1 = `rgba(${rr},${gg},${bb},${opaque})`;
       }
@@ -745,6 +749,13 @@
 
         const settingsPointsList = settings[setting].pointsList;
         for (const prop in settingsPointsList) {
+          if (!INPUT.hasOwnProperty(prop.toUpperCase())) {
+            console.error(
+              `Property input "${prop.toUpperCase()}" not exists in setting: ${currentSetting}`
+            );
+            continue;
+          }
+
           const propidx = INPUT[prop.toUpperCase()];
           m.pointsList[propidx].n = settingsPointsList[prop].length / 2;
 
@@ -1248,7 +1259,7 @@
       colorhsv = new ColorHSV(color_h, color_s, color_v);
       colorhsv.hsv_to_rgb_float();
 
-      // Ant-alising
+      // Anti-alising
       const current_fadeout_in_pixels = radius * (1.0 - hardness);
       const min_fadeout_in_pixels = this.settings_value[BRUSH.ANTI_ALIASING];
 
@@ -1260,10 +1271,9 @@
           (current_optical_radius + min_fadeout_in_pixels / 2.0);
         const radius_new = min_fadeout_in_pixels / (1.0 - hardness_new);
 
-        hardness = hardness_new;
+        hardness = Math.abs(hardness_new);
         radius = radius_new;
       }
-      //
 
       return this.surface.draw_dab(
         x,
