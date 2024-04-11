@@ -197,7 +197,7 @@ def convertBrushMain(*args:tuple) -> None:
 
                     filename_tmp:list = file.split('.')
                     if len(filename_tmp) > 1:
-                        filename = filename_tmp[0]
+                        filename = '.'.join(filename_tmp[0:len(filename_tmp)-1])
                         ext = filename_tmp[-1]
                     else:
                         filename = filename_tmp[0]
@@ -258,7 +258,13 @@ def convertBrushMain(*args:tuple) -> None:
 
 def getAvailableBrushes():
     listBrushes = {
-        'brushes': []
+        'brushes': {
+            "items":[],
+            "path": "/",
+            "settings": {
+                "enabled": True
+            }
+        }
     }
     currentDir:str = os.path.dirname(__file__)
     sourceDir = os.path.join(currentDir, 'brushes')
@@ -268,35 +274,43 @@ def getAvailableBrushes():
 
         for folder in dirs:
             if folder not in listBrushes:
-                listBrushes[folder] = []
+                listBrushes[folder] = {
+                    "items": [],
+                    "path": folder,
+                    "settings": {
+                        "enabled": True
+                    }
+                }
 
         for file in files:
             file_basename = os.path.basename(root)
-            
-            filename_tmp:list = file.split('.')
-            if len(filename_tmp) > 1:
+
+            filename_tmp:list = os.path.splitext(file)
+            if len(filename_tmp) > 1:                                      
                 filename = filename_tmp[0]
                 ext = filename_tmp[-1]
             else:
                 filename = filename_tmp[0]
                 ext = ""
 
-            if ext == 'json':
+            if ext == '.json':
                 keyObj = file_basename
                 if file_basename == '': # myb in the root folder brushes
                     keyObj = 'brushes'
 
-                listBrushes[keyObj].append({
-                    # 'file': file
-                    'filename': filename,
-                    'path': file_basename if file_basename != sourceDirBaseName else '/',
-                    # 'path_json': pathToFile
-                })
+                listBrushes[keyObj]["items"].append(filename.replace(".myb", ""))
+                
+                # listBrushes[keyObj]["items"].append({
+                #     # 'file': file
+                #     'filename': filename,
+                #     'path': file_basename if file_basename != sourceDirBaseName else '/',
+                #     # 'path_json': pathToFile
+                # })
     
     with open(os.path.join(currentDir, 'js', 'brushes_data.json'), 'w', encoding='utf-8') as jsonSave:
         json.dump(listBrushes, jsonSave, indent=2)
         print(f"""Complete:
-Brushes files get: {reduce(lambda acc,cur: acc + len(listBrushes[cur]), listBrushes.keys(), 0)}, foldres {len(listBrushes)}""")
+Brushes files get: {reduce(lambda acc,cur: acc + len(listBrushes[cur]["items"]), listBrushes.keys(), 0)}, foldres {len(listBrushes)}""")
         
 
 

@@ -233,7 +233,13 @@ function convertBrushMain() {
 // Get aviables brushes in the brush directory
 async function getAvailableBrushes() {
   const listBrushed = {
-    brushes: [],
+    brushes: {
+      items: [],
+      path: "/",
+      settings: {
+        enabled: true,
+      },
+    },
   };
   const sourceDir = path.join(__dirname, "brushes");
 
@@ -247,7 +253,13 @@ async function getAvailableBrushes() {
 
       if (file.isDirectory()) {
         if (!listBrushed.hasOwnProperty.call(listBrushed, file.name)) {
-          listBrushed[file.name] = [];
+          listBrushed[file.name] = {
+            items: [],
+            path: file.name,
+            settings: {
+              enabled: true,
+            },
+          };
         }
         return readDir(source);
       }
@@ -261,15 +273,17 @@ async function getAvailableBrushes() {
         let keyObject = pathRelative;
         if (pathRelative === "") {
           keyObject = "brushes";
-          pathRelative = "/";
+          // pathRelative = "/";
         }
 
-        listBrushed[keyObject].push({
-          // file: file.name,
-          filename: filename.replace(".myb", ""),
-          path: pathRelative,
-          // path_json: path.join(pathRelative, file.name),
-        });
+        listBrushed[keyObject].items.push(filename.replace(".myb", ""));
+
+        // listBrushed[keyObject].items.push({
+        //   // file: file.name,
+        //   filename: filename.replace(".myb", ""),
+        //   // path: pathRelative,
+        //   // path_json: path.join(pathRelative, file.name),
+        // });
       }
     });
 
@@ -288,7 +302,7 @@ async function getAvailableBrushes() {
   console.log(
     `Complete:
 Brushes files get: ${Object.keys(listBrushed).reduce(
-      (acc, cur) => acc + listBrushed[cur].length,
+      (acc, cur) => acc + listBrushed[cur].items.length,
       0
     )}, foldres ${Object.keys(listBrushed).length}`
   );

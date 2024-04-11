@@ -99,7 +99,7 @@ class Manager {
     let pathDef = null;
 
     Object.keys(brushesData).forEach((dir) => {
-      const currentDirVals = brushesData[dir];
+      const { items, path } = brushesData[dir];
       if (!currentDir) currentDir = dir;
 
       if (currentDir !== dir) {
@@ -110,14 +110,13 @@ class Manager {
         this.bsel.append(option);
       }
 
-      currentDirVals.forEach((brushData) => {
-        const { filename, path } = brushData;
+      items.forEach((brushData) => {
         const option = document.createElement("option");
-        option.value = filename;
-        option.textContent = filename[0].toUpperCase() + filename.slice(1);
+        option.value = brushData;
+        option.textContent = brushData[0].toUpperCase() + brushData.slice(1);
         option.dataset.path = `brushes/${path === "/" ? "" : path + "/"}`;
 
-        if (filename === this.brushName) {
+        if (brushData === this.brushName) {
           defaultLoad = true;
           option.selected = true;
           pathDef = `${option.dataset.path}${this.brushName}`;
