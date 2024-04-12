@@ -31,3 +31,39 @@ brushConvert support two actions:
 Library : https://github.com/mypaint/libmypaint
 
 Brush library: https://github.com/mypaint/mypaint-brushes
+
+## Convert information:
+
+All avaiables convertered brushes written indise in the file **brushes_data.json**
+
+### Use brushConverter.py (python)
+
+**run_converter_python.cmd**
+
+##### Convert brushes (python)
+
+```bash
+python brushConverter.py convert
+```
+
+##### Generate list brushes (python)
+
+```bash
+python brushConverter.py brushes
+```
+
+### Use brushConverter.js (nodejs)
+
+##### Convert brushes (nodejs)
+
+```bash
+npm run convert
+```
+
+##### Generate list brushes (nodejs)
+
+```bash
+npm run brushes
+```
+
+### Read more in file txt inside folder packs_brushes
